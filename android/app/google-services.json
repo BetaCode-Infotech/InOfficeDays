@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1013563714308",
+    "project_id": "notifications-a81b8",
+    "storage_bucket": "notifications-a81b8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013563714308:android:93a95eab3a398fe939be51",
+        "android_client_info": {
+          "package_name": "com.inofficedays"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFAEb7MDJFJ8l5jAqPowhYfVxLpQEzu9w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
