@@ -1,6 +1,6 @@
 import Icons from '../../../constants/Icons';
 import AllEvents from '../../Screens/AllEvents/AllEvents';
-import Dashboard from '../../Screens/Dashboard/Dashboard';
+import Dashboard from '../../Screens/Dashboard/Dashboard1';
 // import Setting from '../../Screens/Settings/Setting';
 import {
   ALL_EVENTS,

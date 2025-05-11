@@ -17,9 +17,12 @@ import {connect} from 'react-redux';
 
 // import OnBoarding from '../../Screens/OnBoarding/OnBoarding';
 // import SignIn from '../../Screens/SignIn/SignIn';
-import Dashboard from '../../Screens/Dashboard/Dashboard';
-import {DASHBOARD, OTP_VERIFICATION} from '../../utils/Routes/Routes';
-import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
+
+// import Dashboard from '../../Screens/Dashboard/Dashboard';
+import {DASHBOARD, OTP_VERIFICATION, PROFILE} from '../../utils/Routes/Routes';
+// import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
+import ProfileScreen from '../../Screens/Dashboard/Dashboard';
+
 // import ProfileEdit from '../../Screens/Profile/ProfileEdit';
 // import ProfileView from '../../Screens/Profile/ProfileView';
 // import AllEvents from '../../Screens/AllEvents/AllEvents';
@@ -27,7 +30,7 @@ import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
 // import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
 
 // import {toBoolean} from '../../../constants/Fns';
-// import BottomTabNavigator from '../BottomNavigator/BottomNavigator';
+import BottomTabNavigator from '../BottomNavigator/BottomNavigator';
 // import { DASHBOARD } from '../../utils/Routes/Routes';
 
 const Stack = createNativeStackNavigator();
@@ -54,22 +57,29 @@ const StackNavigator = props => {
       <Stack.Navigator
       // initialRouteName={initialRoute}
       >
-        <Stack.Screen
-          name={OTP_VERIFICATION}
-          component={OTPVerification}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
+        {/* <Stack.Screen
           name={DASHBOARD}
           component={Dashboard}
           options={{headerShown: false}}
         />
 
+        <Stack.Screen
+          name={OTP_VERIFICATION}
+          component={OTPVerification}
+          options={{headerShown: false}}
+        /> */}
+
         {/* <Stack.Screen
+          name={PROFILE}
+          component={ProfileScreen}
+          options={{headerShown: false}}
+        /> */}
+
+        <Stack.Screen
           name={DASHBOARD}
           component={BottomTabNavigator}
           options={{headerShown: false}}
-        /> */}
+        />
         {/* <Stack.Screen
           name={PROFILE_EDIT}
           component={ProfileEdit}

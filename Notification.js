@@ -7,7 +7,7 @@ import {
   Vibration,
   View,
 } from 'react-native';
-import PushNotification from 'react-native-push-notification';
+// import PushNotification from 'react-native-push-notification';
 
 export default function Notification() {
   useEffect(() => {
