@@ -7,3 +7,5 @@ export const PROFILE_VIEW = 'profile-view';
 export const ALL_EVENTS = 'all-events';
 export const EVENT_DETAILS = 'event-details';
 export const OTP_VERIFICATION = 'otp-verification';
+
+export const PROFILE = 'profile'

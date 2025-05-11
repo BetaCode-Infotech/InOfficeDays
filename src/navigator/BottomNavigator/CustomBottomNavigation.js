@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {ScreenNamesList} from './ScreenNamesList';
-import ImageIcon from '../../../components/ImageIcon/ImageIcon';
+// import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import {COLORS} from '../../../constants/theme';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 
