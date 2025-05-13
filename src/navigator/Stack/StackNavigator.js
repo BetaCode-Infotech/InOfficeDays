@@ -19,7 +19,7 @@ import {connect} from 'react-redux';
 // import SignIn from '../../Screens/SignIn/SignIn';
 
 // import Dashboard from '../../Screens/Dashboard/Dashboard';
-import {DASHBOARD, OTP_VERIFICATION, PROFILE} from '../../utils/Routes/Routes';
+import {DASHBOARD, GROUP, LOCATION, OTP_VERIFICATION, PROFILE} from '../../utils/Routes/Routes';
 // import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
 import ProfileScreen from '../../Screens/Dashboard/Dashboard';
 
@@ -31,6 +31,8 @@ import ProfileScreen from '../../Screens/Dashboard/Dashboard';
 
 // import {toBoolean} from '../../../constants/Fns';
 import BottomTabNavigator from '../BottomNavigator/BottomNavigator';
+import AddGroup from '../../Screens/AddGroup/AddGroup';
+import AddLocation from '../../Screens/AddLocation/AddLocation';
 // import { DASHBOARD } from '../../utils/Routes/Routes';
 
 const Stack = createNativeStackNavigator();
@@ -80,6 +82,17 @@ const StackNavigator = props => {
           component={BottomTabNavigator}
           options={{headerShown: false}}
         />
+        <Stack.Screen
+          name={GROUP}
+          component={AddGroup}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={LOCATION}
+          component={AddLocation}
+          options={{headerShown: false}}
+        />
+
         {/* <Stack.Screen
           name={PROFILE_EDIT}
           component={ProfileEdit}
