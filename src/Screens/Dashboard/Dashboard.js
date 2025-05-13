@@ -1,11 +1,20 @@
 import React from 'react';
-import {Text, TouchableOpacity, Image, SafeAreaView, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 // import styles from './ProfileStyles';
 import profile from '../../../assets/icons/profile.png';
 import location from '../../../assets/icons/gps.png';
 import people from '../../../assets/icons/people.png';
 import LinearGradient from 'react-native-linear-gradient';
+import ellipse from '../../../assets/icons/ellipse.png';
+import {GROUP, LOCATION} from '../../utils/Routes/Routes';
 // import BottomTabNavigator from '../../navigator/BottomNavigator/BottomNavigator'
 
 export default function Dashboard() {
@@ -14,21 +23,39 @@ export default function Dashboard() {
   return (
     <SafeAreaView style={styles.container}>
       <SafeAreaView style={styles.profileIconWrapper}>
+        <Image source={ellipse} style={styles.ellipse} />
         <Image source={profile} style={styles.profileIcon} />
       </SafeAreaView>
       <SafeAreaView style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('AddGroup')}>
-          <LinearGradient colors={['#8e2de2', '#4a00e0']} style={styles.button}>
-            <Image source={people} style={styles.icon} />
+        <TouchableOpacity onPress={() => navigation.navigate(GROUP)}>
+          <LinearGradient colors={['#4567F3', '#AA95FA']} style={styles.button}>
+            <View style={styles.buttonInner}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>Add Group</Text>
+                <View style={styles.iconWrapper}>
+                  <Image source={people} style={styles.icon} />
+                </View>
+              </View>
+            </View>
+
+            <Text style={styles.buttonText1}>Add Group to get started</Text>
           </LinearGradient>
         </TouchableOpacity>
-        <Text style={styles.buttonText}>Step 1: Add Group</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('AddLocation')}>
-          <LinearGradient colors={['#8e2de2', '#4a00e0']} style={styles.button}>
-            <Image source={location} style={styles.icon} />
+
+        <TouchableOpacity onPress={() => navigation.navigate(LOCATION)}>
+          <LinearGradient colors={['#4567F3', '#AA95FA']} style={styles.button}>
+            <View style={styles.buttonInner}>
+              <View style={styles.buttonContent}>
+                <Text style={styles.buttonText}>Add Location</Text>
+                <View style={styles.iconWrapper}>
+                  <Image source={location} style={styles.icon} />
+                </View>
+              </View>
+            </View>
+
+            <Text style={styles.buttonText1}>Capture your location</Text>
           </LinearGradient>
         </TouchableOpacity>
-        <Text style={styles.buttonText}>Step 2: Add Location</Text>
       </SafeAreaView>
       {/* <BottomTabNavigator /> */}
     </SafeAreaView>
@@ -36,45 +63,67 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
- container: {
+  container: {
     flex: 1,
     backgroundColor: '#fff',
   },
+  buttonInner: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
   profileIconWrapper: {
     position: 'absolute',
-    top: 50,
+    top: 20,
     left: 20,
   },
+  ellipse: {
+    width: 49,
+    height: 49,
+  },
   profileIcon: {
-    width: 40,
-    height: 40,
+    position: 'absolute',
+    width: 49,
+    height: 49,
   },
   buttonContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  buttonContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
   button: {
-    paddingVertical: 15,
-    paddingHorizontal: 100,
     borderRadius: 15,
     marginVertical: 15,
-    width: '100%',
+    width: 350,
     height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingTop: 20,
+    paddingHorizontal: 30,
   },
   buttonText: {
-    color: 'black',
-    fontSize: 20,
+    color: 'white',
+    fontSize: 25,
   },
-  icon:{
-    width:55,
-    height:55,
-    tintColor: '#ffffff'
+  buttonText1: {
+    color: 'white',
+    fontSize: 20,
+    paddingBottom: 20,
+  },
+  iconWrapper: {
+    backgroundColor: '#ffffff20',
+    borderRadius: 15,
+    padding: 8,
+    borderWidth: 0.4,
+    borderColor: 'white',
+    elevation: 6,
+  },
+  icon: {
+    width: 30,
+    height: 30,
+    tintColor: '#ffffff',
   },
   gradient: {
     flex: 1,

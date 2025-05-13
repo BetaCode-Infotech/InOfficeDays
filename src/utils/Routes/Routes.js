@@ -9,3 +9,5 @@ export const EVENT_DETAILS = 'event-details';
 export const OTP_VERIFICATION = 'otp-verification';
 
 export const PROFILE = 'profile'
+export const GROUP = 'group'
+export const LOCATION = 'location'
