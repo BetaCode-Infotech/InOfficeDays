@@ -1,6 +1,7 @@
 export const ONBOARDING = 'onboarding';
 export const SIGNIN = 'signin';
 export const DASHBOARD = 'dashboard';
+export const DASHBOARD1 = 'dashboard1';
 export const DASHBOARD_BOTTOM = 'dashboard-bottom';
 export const PROFILE_EDIT = 'profile-edit';
 export const PROFILE_VIEW = 'profile-view';

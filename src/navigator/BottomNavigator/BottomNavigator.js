@@ -29,6 +29,7 @@ import ProfileScreen from '../../Screens/Dashboard/Dashboard';
 import home from '../../../assets/icons/home.png';
 import location from '../../../assets/icons/gps.png';
 import user from '../../../assets/icons/user.png';
+import AddGroup from '../../Screens/AddGroup/AddGroup';
 
 const Tab = createBottomTabNavigator();
 
@@ -152,6 +153,22 @@ const BottomTabNavigator = () => {
         component={ProfileScreen} // This is my screen
         options={{
           title: 'Profile',
+          headerShown: false,
+          tabBarIcon: ({focused, size, color}) => (
+            <Image
+              source={user}
+              style={styles.profile}
+              color={focused ? '#21a3f1' : COLORS.gray50}
+            />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Group"
+        component={AddGroup} // This is my screen
+        options={{
+          title: 'Group',
           headerShown: false,
           tabBarIcon: ({focused, size, color}) => (
             <Image

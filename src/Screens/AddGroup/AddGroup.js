@@ -17,13 +17,17 @@ import ellipse from '../../../assets/icons/ellipse.png';
 import home from '../../../assets/icons/home.png';
 import React, {useState} from 'react';
 // import RNPickerSelect from 'react-native-picker-select';
+import down from '../../../assets/icons/arrow_drop_down.png';
+import BottomTabNavigator from '../../navigator/BottomNavigator/BottomNavigator';
 
 export default function AddGroup() {
   const navigation = useNavigation();
   const [groupName, setGroupName] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownOptions = ['Option 1', 'Option 2', 'Option 3'];
+  const [isDropdownOpenCategory, setIsDropdownOpenCategory] = useState(false);
+  const [isDropdownOpenFrequency, setIsDropdownOpenFrequency] = useState(false);
+  const categoryOptionsGroup = ['Option 1', 'Option 2', 'Option 3'];
+  const categoryOptionsFrequency = ['Data 1', 'Data 2', 'Data 3'];
 
   return (
     <SafeAreaView style={styles.MainContainer}>
@@ -54,44 +58,30 @@ export default function AddGroup() {
             placeholder="Group Name"
             value={groupName}
             onChangeText={setGroupName}
-            placeholderTextColor="#888"
+            placeholderTextColor="#000"
           />
-
-          {/* <RNPickerSelect
-          onValueChange={value => setSelectedOption(value)}
-          items={[
-            {label: 'Option 1', value: 'option1'},
-            {label: 'Option 2', value: 'option2'},
-            {label: 'Option 3', value: 'option3'},
-          ]}
-          placeholder={{label: 'Select an option', value: null}}
-          style={{
-            inputIOS: styles.picker,
-            inputAndroid: styles.picker,
-          }}
-          value={selectedOption}
-        /> */}
 
           <Text style={styles.GroupText}>Category</Text>
           <TouchableOpacity
             style={styles.dropdownHeader}
-            onPress={() => setIsDropdownOpen(!isDropdownOpen)}>
+            onPress={() => setIsDropdownOpenCategory(!isDropdownOpenCategory)}>
             <Text style={styles.dropdownHeaderText}>
               {selectedOption || 'Category'}
             </Text>
+            <Image source={down} style={styles.arrowIcon} />
           </TouchableOpacity>
 
-          {isDropdownOpen && (
+          {isDropdownOpenCategory && (
             <View style={styles.dropdownList}>
               <FlatList
-                data={dropdownOptions}
+                data={categoryOptionsGroup}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({item}) => (
                   <TouchableOpacity
                     style={styles.dropdownItem}
                     onPress={() => {
                       setSelectedOption(item);
-                      setIsDropdownOpen(false);
+                      setIsDropdownOpenCategory(false);
                     }}>
                     <Text style={styles.dropdownItemText}>{item}</Text>
                   </TouchableOpacity>
@@ -99,8 +89,56 @@ export default function AddGroup() {
               />
             </View>
           )}
+
+          <Text style={styles.GroupText}>Milestone Frequency</Text>
+          <TouchableOpacity
+            style={styles.dropdownHeader}
+            onPress={() =>
+              setIsDropdownOpenFrequency(!isDropdownOpenFrequency)
+            }>
+            <Text style={styles.dropdownHeaderText}>
+              {selectedOption || 'Milestone Frequency'}
+            </Text>
+            <Image source={down} style={styles.arrowIcon} />
+          </TouchableOpacity>
+
+          {isDropdownOpenFrequency && (
+            <View style={styles.dropdownList}>
+              <FlatList
+                data={categoryOptionsFrequency}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedOption(item);
+                      setIsDropdownOpenFrequency(false);
+                    }}>
+                    <Text style={styles.dropdownItemText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
+
+          <Text style={styles.GroupText}>Milestone Days</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Milestone Days"
+            value={groupName}
+            onChangeText={setGroupName}
+            placeholderTextColor="#000"
+          />
         </View>
       </TouchableWithoutFeedback>
+
+      <View style={styles.bottomButtonContainer}>
+        <TouchableOpacity
+          style={styles.bottomButton}
+          onPress={() => console.log('Submit pressed')}>
+          <Text style={styles.bottomButtonText}>Save</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -110,7 +148,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     flexDirection: 'column',
-    backgroundColor: 'rgb(226, 225, 230)',
+    backgroundColor: 'White',
   },
   TopContainer: {
     flexDirection: 'row',
@@ -146,7 +184,7 @@ const styles = StyleSheet.create({
     tintColor: '#ffffff',
   },
   SecondContainer: {
-    marginTop: 100,
+    marginTop: 50,
   },
   GroupText: {
     color: 'Black',
@@ -164,16 +202,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 20,
   },
-  // picker: {
-  //   height: 50,
-  //   borderColor: '#999',
-  //   borderWidth: 1,
-  //   borderRadius: 8,
-  //   paddingHorizontal: 10,
-  //   justifyContent: 'center',
-  //   backgroundColor: '#fff',
-  //   color: '#333',
-  // },
 
   dropdownHeader: {
     height: 50,
@@ -183,6 +211,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: 'center',
     backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+  arrowIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#555',
+    position: 'absolute',
+    right: 15,
+    top: '50%',
+    marginTop: -15,
   },
 
   dropdownHeaderText: {
@@ -209,5 +247,30 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 16,
     color: '#333',
+  },
+
+  bottomButtonContainer: {
+    marginTop: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  bottomButton: {
+    backgroundColor: '#4B7BE5',
+    paddingVertical: 15,
+    borderRadius: 30,
+    alignItems: 'center',
+    width: '50%',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+
+  bottomButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
