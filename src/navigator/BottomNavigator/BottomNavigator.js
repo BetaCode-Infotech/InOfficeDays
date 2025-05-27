@@ -1,6 +1,6 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 // import React from 'react';
-import {StyleSheet,Image} from 'react-native';
+import {StyleSheet, Image} from 'react-native';
 import {
   ACCOUNT_DETAILS,
   ALL_EVENTS,
@@ -11,25 +11,19 @@ import {
   PORTFOLIO,
   PROFILE_VIEW,
   SETTINGS,
+  VIEW_GROUP,
+  VIEW_LOCATION,
   WATCH_LIST,
 } from '../../utils/Routes/Routes';
-// import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 
 import Dashboard from '../../Screens/Dashboard/Dashboard';
 import {COLORS} from '../../../constants/theme';
 import Icons from '../../../constants/Icons';
-import ImageIcon from '../../../components/IconButton/IconButton';
-// import CustomBottomTabBar from './CustomBottomNavigation';
-// import AllEvents from '../../Screens/AllEvents/AllEvents';
-// import Icon from 'react-native-vector-icons/dist/FontAwesome';
-// import ProfileView from '../../Screens/Profile/ProfileView';
-import LocationScreen from '../../Screens/LocationScreen/LocationScreen';
-import ProfileScreen from '../../Screens/Dashboard/Dashboard';
-// import calendar from '../../../assets/icons/calendar.png';
+import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import home from '../../../assets/icons/home.png';
-import location from '../../../assets/icons/gps.png';
 import user from '../../../assets/icons/user.png';
-import AddGroup from '../../Screens/AddGroup/AddGroup';
+import ViewGroups from '../../Screens/Group/ViewGroups';
+import ViewLocations from '../../Screens/Location/ViewLocations';
 
 const Tab = createBottomTabNavigator();
 
@@ -37,8 +31,6 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       initialRouteName={DASHBOARD_BOTTOM}
-      // tabBar={props => <CustomBottomNavigation {...props} />}
-      //   tabBar={props => <CustomBottomTabBar {...props} />}
       screenOptions={({route}) => ({
         tabBarIcon: ({focused, color, size}) => {
           return (
@@ -47,11 +39,8 @@ const BottomTabNavigator = () => {
               iconStyle={{
                 height: 25,
                 width: 25,
-                // tintColor: '#21a3f1',
               }}
             />
-            // <HomeOutlined />
-            // <Icon name="rocket" size={30} color="#900" />
           );
         },
         tabBarActiveTintColor: COLORS.activeBlue,
@@ -64,140 +53,77 @@ const BottomTabNavigator = () => {
           title: 'Dashboard',
           headerShown: false,
           tabBarIcon: ({focused, size, color}) => (
-            // <ImageIcon
-            //   icon={Icons.dashboard}
-            //   iconStyle={{
-            //     height: 20,
-            //     width: 20,
-            //     // tintColor: focused ? '#21a3f1' : COLORS.gray60,
-            //   }}
-            // />
-            <Image
-              source={home}
-              style={styles.home}
-              color={focused ? '#21a3f1' : COLORS.gray50}
+            <ImageIcon
+              icon={Icons.home}
+              iconStyle={{
+                height: 20,
+                width: 20,
+                tintColor: focused ? '#21a3f1' : COLORS.gray50,
+              }}
             />
           ),
         }}
       />
-      {/* <Tab.Screen
-        name={ALL_EVENTS}
-        component={AllEvents}
-        options={{
-          title: 'Events',
-          headerShown: false,
-          tabBarIcon: ({focused, size, color}) => (
-            // <ImageIcon
-            //   icon={Icons.settings_blue}
-            //   iconStyle={{
-            //     height: 25,
-            //     width: 25,
-            //     // tintColor: focused ? '#21a3f1' : COLORS.gray60,
-            //   }}
-            // />
-            <Image
-              source={calendar}
-              size={25}
-              color={focused ? '#21a3f1' : COLORS.gray50}
-            />
-          ),
-        }}
-      /> */}
-
-
-      
-      {/* <Tab.Screen
-        name={PROFILE_VIEW}
-        component={ProfileView}
-        options={{
-          title: 'Profile',
-          headerShown: false,
-          tabBarIcon: ({focused, size, color}) => (
-            // <ImageIcon
-            //   icon={Icons.settings_blue}
-            //   iconStyle={{
-            //     height: 25,
-            //     width: 25,
-            //     // tintColor: focused ? '#21a3f1' : COLORS.gray60,
-            //   }}
-            // />
-            <Icon
-              name="user"
-              size={25}
-              color={focused ? '#21a3f1' : COLORS.gray50}
-            />
-          ),
-        }}
-      /> */}
-
-
-
       <Tab.Screen
-        name="Location"
-        component={LocationScreen}
+        name={VIEW_GROUP}
+        component={ViewGroups}
         options={{
-          title: 'Map',
-          headerShown: false,
-          tabBarIcon: ({focused}) => (
-            <Image
-              source={location}
-              style={styles.location}
-              color={focused ? '#21a3f1' : COLORS.gray50}
-            />
-          ),
-        }}
-      />
-
-      <Tab.Screen
-        name={PROFILE_VIEW}
-        component={ProfileScreen} // This is my screen
-        options={{
-          title: 'Profile',
+          title: 'Groups',
           headerShown: false,
           tabBarIcon: ({focused, size, color}) => (
-            <Image
-              source={user}
-              style={styles.profile}
-              color={focused ? '#21a3f1' : COLORS.gray50}
+            // <Image
+            //   source={user}
+            //   style={[
+            //     styles.profile,
+
+            //   ]}
+            // />
+            <ImageIcon
+              icon={Icons.group}
+              iconStyle={{
+                height: 25,
+                width: 25,
+                tintColor: focused ? '#21a3f1' : COLORS.gray50,
+              }}
             />
           ),
         }}
       />
-
       <Tab.Screen
-        name="Group"
-        component={AddGroup} // This is my screen
+        name={VIEW_LOCATION}
+        component={ViewLocations}
         options={{
-          title: 'Group',
+          title: 'Locations',
           headerShown: false,
           tabBarIcon: ({focused, size, color}) => (
-            <Image
-              source={user}
-              style={styles.profile}
-              color={focused ? '#21a3f1' : COLORS.gray50}
+            <ImageIcon
+              icon={Icons.locationGroup}
+              iconStyle={{
+                height: 25,
+                width: 25,
+                tintColor: focused ? '#21a3f1' : COLORS.gray50,
+              }}
             />
           ),
         }}
       />
-
-      {/* <Tab.Screen name="Settings" component={SettingsScreen} /> */}
     </Tab.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
-  profile:{
+  profile: {
     width: 20,
     height: 20,
   },
-  home:{
+  home: {
     width: 20,
     height: 20,
   },
-  location:{
+  location: {
     width: 20,
     height: 20,
-  }
-})
+  },
+});
 
 export default BottomTabNavigator;

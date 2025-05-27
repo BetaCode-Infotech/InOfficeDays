@@ -9,6 +9,8 @@ export const ALL_EVENTS = 'all-events';
 export const EVENT_DETAILS = 'event-details';
 export const OTP_VERIFICATION = 'otp-verification';
 
-export const PROFILE = 'profile'
-export const GROUP = 'group'
-export const LOCATION = 'location'
+export const PROFILE = 'profile';
+export const ADD_GROUP = 'add-group';
+export const ADD_LOCATION = 'add-location';
+export const VIEW_LOCATION = 'view-location';
+export const VIEW_GROUP = 'view-group';

@@ -13,6 +13,14 @@ const phoneCall = require('../assets/icons/phone-call.png');
 const user = require('../assets/icons/user.png');
 const checklist = require('../assets/icons/checklist.png');
 const filter = require('../assets/icons/filter.png');
+const workspace = require('../assets/icons/workspace.png');
+const hearts = require('../assets/icons/hearts.png');
+const fitness = require('../assets/icons/fitness.png');
+const home = require('../assets/icons/home.png');
+const group = require('../assets/icons/group.png');
+const pinBorder = require('../assets/icons/pin-border.png');
+const pinFilled = require('../assets/icons/pin-filled.png');
+const locationGroup = require('../assets/icons/locations-group.png');
 const updownArrow = require('../assets/icons/up-and-down-arrow.png');
 
 export default {
@@ -32,4 +40,12 @@ export default {
   checklist,
   updownArrow,
   filter,
+  workspace,
+  hearts,
+  fitness,
+  home,
+  group,
+  locationGroup,
+  pinBorder,
+  pinFilled,
 };

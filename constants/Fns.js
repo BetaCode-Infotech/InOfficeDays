@@ -1,3 +1,6 @@
+import {Icon} from 'react-native-paper';
+import Icons from './Icons';
+
 export const toastConfig = {
   tomatoToast: ({text1, props}) => (
     // <View style={{height: 60, width:width-30, backgroundColor: 'tomato',margin:10, padding:10,borderRadius:10}}>
@@ -59,3 +62,21 @@ export const toastConfig = {
 export function toBoolean(value) {
   return value === 1 ? true : value === 0 ? false : value;
 }
+
+export const CategoryList = [
+  {
+    CATEGORY_ID: 1,
+    CATEGORY_NAME: 'Fitness',
+    CATEGORY_ICON: Icons.fitness,
+  },
+  {
+    CATEGORY_ID: 2,
+    CATEGORY_NAME: 'Office',
+    CATEGORY_ICON: Icons.workspace,
+  },
+  {
+    CATEGORY_ID: 3,
+    CATEGORY_NAME: 'Meet Girlfriend',
+    CATEGORY_ICON: Icons.hearts,
+  },
+];
