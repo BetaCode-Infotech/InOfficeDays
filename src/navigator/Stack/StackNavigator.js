@@ -27,11 +27,9 @@ const StackNavigator = props => {
   const [initialRoute, setInitialRoute] = useState(null);
 
   useEffect(() => {
-    console.log('sadjnasdasda', props.AUTH_DATA);
-
     if (props.AUTH_DATA?.USER_ID) {
       if (props.AUTH_DATA?.NEW_USER === true) {
-        // setInitialRoute(PROFILE_EDIT);
+        setInitialRoute(PROFILE_EDIT);
       } else {
         setInitialRoute(DASHBOARD);
       }

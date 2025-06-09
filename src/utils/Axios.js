@@ -1,6 +1,7 @@
 const axiosUrl = 'http://pdhanewala.com:4000/';
 const loginOTPSend = 'inOffice/user/loginOTPSend';
 const loginOTPVerify = 'inOffice/user/loginOTPVerify';
+const userUpdate = 'inOffice/user/userUpdate';
 const getSessionById = 'sessions/getSessionById';
 const createGroups = 'inOffice/group/createGroup';
 const updateGroup = 'inOffice/group/updateGroup';
@@ -13,6 +14,7 @@ export default {
   axiosUrl,
   loginOTPSend,
   loginOTPVerify,
+  userUpdate,
   createGroups,
   updateGroup,
   getSessionById,

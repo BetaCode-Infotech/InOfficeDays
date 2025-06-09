@@ -11,7 +11,7 @@ const Loader = ({visible, Label}) => {
         source={require('../../assets/lottie/clock-time.json')}
         animationStyle={styles.lottie}
         speed={1}>
-        <Text>{Label}</Text>
+        {/* <Text>{Label}</Text> */}
       </AnimatedLoader>
     </View>
   );

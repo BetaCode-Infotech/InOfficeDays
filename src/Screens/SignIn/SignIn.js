@@ -81,7 +81,6 @@ const SingIn = props => {
           IS_VERIFIED: false,
         })
         .then(response => {
-          console.log('Asdasndjkasdas', response.data);
           setVisible(false);
           if (response.data.OTP_SEND == true) {
             navigation.navigate(OTP_VERIFICATION, {
