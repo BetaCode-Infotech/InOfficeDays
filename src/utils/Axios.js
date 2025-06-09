@@ -1,25 +1,24 @@
-const axiosUrl = 'https://pdhanewala.com:9004/';
-// const axiosUrl = 'http://98.70.74.89:9003/';
-const userLogin = 'user/userLogin';
-const verifyOtp = 'user/verify-otp';
-const getAllEvents = 'event/getAllEvents';
-const updateUser = 'user/updateUser';
+const axiosUrl = 'http://pdhanewala.com:4000/';
+const loginOTPSend = 'inOffice/user/loginOTPSend';
+const loginOTPVerify = 'inOffice/user/loginOTPVerify';
 const getSessionById = 'sessions/getSessionById';
-const getEnrolledUserById = 'enrolledUser/getEnrolledUserById';
-const createEnrolledUser = 'enrolledUser/createEnrolledUser';
-const updateEnrolledUser = 'enrolledUser/updateEnrolledUser';
+const createGroups = 'inOffice/group/createGroup';
+const updateGroup = 'inOffice/group/updateGroup';
+const createLocation = 'inOffice/location/createLocation';
+const updateLocation = 'inOffice/location/updateLocation';
+const getGroupByUser = 'inOffice/group/getGroupByUser';
+const getLocationByGroup = 'inOffice/location/getLocationByGroup';
 const userLogout = 'user/userLogout';
-const isCouponValid = 'coupons/isCouponValid';
 export default {
   axiosUrl,
-  userLogin,
-  verifyOtp,
-  getAllEvents,
-  updateUser,
+  loginOTPSend,
+  loginOTPVerify,
+  createGroups,
+  updateGroup,
   getSessionById,
-  getEnrolledUserById,
-  createEnrolledUser,
-  updateEnrolledUser,
+  createLocation,
+  updateLocation,
   userLogout,
-  isCouponValid,
+  getGroupByUser,
+  getLocationByGroup,
 };

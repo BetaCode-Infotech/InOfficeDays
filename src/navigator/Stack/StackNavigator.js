@@ -8,20 +8,70 @@ import {
   DASHBOARD,
   GROUP,
   LOCATION,
+  ONBOARDING,
   OTP_VERIFICATION,
   PROFILE,
+  PROFILE_EDIT,
+  SIGNIN,
 } from '../../utils/Routes/Routes';
 import BottomTabNavigator from '../BottomNavigator/BottomNavigator';
 import AddLocation from '../../Screens/Location/AddLocation';
 import AddGroup from '../../Screens/Group/AddGroup';
+import SingIn from '../../Screens/SignIn/SignIn';
+import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
+import Profile from '../../Screens/Profile/Profile';
+import OnBoarding from '../../Screens/OnBoarding/OnBoarding';
+import ProfileEdit from '../../Screens/Profile/ProfileEdit';
 const Stack = createNativeStackNavigator();
 const StackNavigator = props => {
+  const [initialRoute, setInitialRoute] = useState(null);
+
+  useEffect(() => {
+    console.log('sadjnasdasda', props.AUTH_DATA);
+
+    if (props.AUTH_DATA?.USER_ID) {
+      if (props.AUTH_DATA?.NEW_USER === true) {
+        // setInitialRoute(PROFILE_EDIT);
+      } else {
+        setInitialRoute(DASHBOARD);
+      }
+    } else {
+      setInitialRoute(ONBOARDING);
+    }
+  }, [props.AUTH_DATA]);
+
+  if (!initialRoute) return null;
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName={initialRoute}>
+        <Stack.Screen
+          name={ONBOARDING}
+          component={OnBoarding}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={SIGNIN}
+          component={SingIn}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={OTP_VERIFICATION}
+          component={OTPVerification}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name={DASHBOARD}
           component={BottomTabNavigator}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={PROFILE}
+          component={Profile}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={PROFILE_EDIT}
+          component={ProfileEdit}
           options={{headerShown: false}}
         />
         <Stack.Screen

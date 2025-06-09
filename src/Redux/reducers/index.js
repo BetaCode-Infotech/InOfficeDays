@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 import authData from './authData';
-import eventData from './eventData';
+import groupData from './groupData';
 export default combineReducers({
   authData: authData,
-  eventData: eventData,
+  groupData: groupData,
 });

@@ -19,13 +19,18 @@ import locationIcon from '../../../assets/icons/gps.png';
 import down from '../../../assets/icons/arrow_drop_down.png';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Header from '../../../components/Header/Header';
+import {Dropdown} from 'react-native-element-dropdown';
 
 export default function AddLocation() {
   const navigation = useNavigation();
   const [locationName, setLocationName] = useState('');
+  const [group, setGroup] = useState(null);
   const [googleLocation, setGoogleLocation] = useState('');
   const [radius, setRadius] = useState('Select Radius');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const groupOptions = [];
 
   const radiusOptions = [
     {label: '500m', icon: locationIcon},
@@ -51,9 +56,32 @@ export default function AddLocation() {
     }).start();
   };
 
-  const handleSelectRadius = value => {
-    setRadius(value.label);
-    setShowDropdown(false);
+  const onSave = () => {
+    const newErrors = {};
+    if (!locationName.trim())
+      newErrors.locationName = 'Location name is required.';
+    if (!googleLocation.trim())
+      newErrors.googleLocation = 'Location is required.';
+    if (radius === 'Select Radius') newErrors.radius = 'Radius is required.';
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+    axios
+      .post(Axios.axiosUrl + Axios.createGroups, {
+        LOCATION_NAME: locationName,
+        LOCATION: googleLocation,
+        RADIUS: radius,
+        GROUP_ID: '',
+        USER_ID: '68388b31488f92f58b452d35',
+      })
+      .then(response => {
+        console.log('Group Created');
+      })
+      .catch(err => {
+        console.log('Err', err);
+      });
+    console.log('Location saved:', {locationName, googleLocation, radius});
   };
 
   return (
@@ -63,14 +91,50 @@ export default function AddLocation() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           {/* Location Name */}
           <View style={{marginTop: 20, gap: 1}}>
-            <Text style={styles.label}>Location Name *</Text>
+            <Text style={styles.label}>Groups *</Text>
+            <Dropdown
+              style={styles.cardInput}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              iconStyle={styles.iconStyle}
+              data={groupOptions}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Group"
+              value={group}
+              onChange={item => {
+                setGroup(item.value);
+                setErrors(prev => ({...prev, group: undefined}));
+              }}
+              renderItem={item => (
+                <View style={styles.itemContainer}>
+                  <Text style={styles.itemText}>{item.label}</Text>
+                </View>
+              )}
+              renderSelectedItem={(item, index) => (
+                <View style={styles.selectedItemContainer}>
+                  <Text style={styles.itemText}>{item.label}</Text>
+                </View>
+              )}
+            />
+            {errors.group && (
+              <Text style={styles.errorText}>{errors.group}</Text>
+            )}
+            <Text style={[styles.label, {marginTop: 20}]}>Location Name *</Text>
             <TextInput
               style={styles.cardInput}
               placeholder="Enter location name"
               placeholderTextColor="#aaa"
               value={locationName}
-              onChangeText={setLocationName}
+              onChangeText={text => {
+                setLocationName(text);
+                setErrors(prev => ({...prev, locationName: undefined}));
+              }}
             />
+            {errors.locationName && (
+              <Text style={styles.errorText}>{errors.locationName}</Text>
+            )}
 
             {/* Google Location */}
             <Text style={[styles.label, {marginTop: 20}]}>Location *</Text>
@@ -79,47 +143,48 @@ export default function AddLocation() {
               placeholder="Search for a location"
               placeholderTextColor="#aaa"
               value={googleLocation}
-              onChangeText={setGoogleLocation}
+              onChangeText={text => {
+                setGoogleLocation(text);
+                setErrors(prev => ({...prev, googleLocation: undefined}));
+              }}
               // Integrate Google Places API here
             />
+            {errors.googleLocation && (
+              <Text style={styles.errorText}>{errors.googleLocation}</Text>
+            )}
 
             {/* Radius Dropdown */}
             <Text style={[styles.label, {marginTop: 20}]}>Radius *</Text>
-            <TouchableOpacity
-              style={[
-                styles.cardInput,
-                {
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                },
-              ]}
-              onPress={() => setShowDropdown(!showDropdown)}>
-              <Text
-                style={{color: radius === 'Select Radius' ? '#aaa' : '#000'}}>
-                {radius}
-              </Text>
-              <Image
-                source={down}
-                style={{width: 20, height: 20, tintColor: '#999'}}
-              />
-            </TouchableOpacity>
-
-            {showDropdown && (
-              <View style={styles.dropdownCard}>
-                <FlatList
-                  data={radiusOptions}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({item}) => (
-                    <TouchableOpacity
-                      style={styles.itemContainer}
-                      onPress={() => handleSelectRadius(item)}>
-                      <Image source={item.icon} style={styles.itemIcon} />
-                      <Text style={styles.itemText}>{item.label}</Text>
-                    </TouchableOpacity>
-                  )}
-                />
-              </View>
+            <Dropdown
+              style={styles.cardInput}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              iconStyle={styles.iconStyle}
+              data={radiusOptions}
+              maxHeight={300}
+              labelField="label"
+              valueField="label"
+              placeholder="Select Radius"
+              value={radius === 'Select Radius' ? null : radius}
+              onChange={item => {
+                setRadius(item.label);
+                setErrors(prev => ({...prev, radius: undefined}));
+              }}
+              renderItem={item => (
+                <View style={styles.itemContainer}>
+                  <Image source={item.icon} style={styles.itemIcon} />
+                  <Text style={styles.itemText}>{item.label}</Text>
+                </View>
+              )}
+              renderSelectedItem={(item, index) => (
+                <View style={styles.selectedItemContainer}>
+                  <Image source={item.icon} style={styles.itemIcon} />
+                  <Text style={styles.itemText}>{item.label}</Text>
+                </View>
+              )}
+            />
+            {errors.radius && (
+              <Text style={styles.errorText}>{errors.radius}</Text>
             )}
 
             {/* Submit Button */}
@@ -132,7 +197,7 @@ export default function AddLocation() {
                 <Pressable
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
-                  onPress={() => console.log('Submit pressed')}
+                  onPress={onSave}
                   style={styles.bottomButton}>
                   <Text style={styles.bottomButtonText}>Save</Text>
                 </Pressable>
@@ -212,5 +277,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  placeholderStyle: {
+    color: '#aaa',
   },
 });

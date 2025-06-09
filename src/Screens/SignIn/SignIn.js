@@ -76,11 +76,12 @@ const SingIn = props => {
       setVisible(true);
 
       await axios
-        .post(Axios.axiosUrl + Axios.userLogin, {
-          EMAIL: userName,
+        .post(Axios.axiosUrl + Axios.loginOTPSend, {
+          USER_EMAIL: userName,
           IS_VERIFIED: false,
         })
         .then(response => {
+          console.log('Asdasndjkasdas', response.data);
           setVisible(false);
           if (response.data.OTP_SEND == true) {
             navigation.navigate(OTP_VERIFICATION, {

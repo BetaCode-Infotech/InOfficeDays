@@ -32,53 +32,57 @@ const OTPVerification = props => {
   const EMAIL = props.route?.params ?? null;
   const [visible, setVisible] = useState(false);
 
-  const [otp, setOtp] = useState(new Array(6).fill(''));
+  const [otp, setOtp] = useState(null);
   const inputs = useRef([]);
 
-  const handleChange = (text, index) => {
-    if (text.length > 1) {
-      const newOtp = text.split('').slice(0, 6);
-      setOtp(newOtp);
-      if (newOtp.length === 6) {
-        inputs.current[5]?.blur();
-      }
-    } else {
-      const newOtp = [...otp];
-      newOtp[index] = text;
-      setOtp(newOtp);
-      if (text && index < 5) {
-        inputs.current[index + 1]?.focus();
-      }
-    }
-  };
+  // const handleChange = (text, index) => {
+  //   if (text.length > 1) {
+  //     const newOtp = text.split('').slice(0, 6);
+  //     setOtp(newOtp);
+  //     if (newOtp.length === 6) {
+  //       inputs.current[5]?.blur();
+  //     }
+  //   } else {
+  //     const newOtp = [...otp];
+  //     newOtp[index] = text;
+  //     setOtp(newOtp);
+  //     if (text && index < 5) {
+  //       inputs.current[index + 1]?.focus();
+  //     }
+  //   }
+  // };
 
   const handleSubmit = async () => {
-    // const finalOtp = otp.join('');
-    const finalOtp = otp.join('');
-    const isValidOtp =
-      finalOtp.length === 6 && otp.every(char => /^\d$/.test(char));
+    const isValidOtp = String(otp).length === 6;
 
     if (isValidOtp) {
       setVisible(true);
+      console.log('asdknasjdas', {
+        USER_EMAIL: EMAIL.EMAIL,
+        OTP: otp,
+      });
+
       await axios
-        .post(Axios.axiosUrl + Axios.verifyOtp, {
-          EMAIL: EMAIL,
-          OTP: finalOtp,
+        .post(Axios.axiosUrl + Axios.loginOTPVerify, {
+          USER_EMAIL: EMAIL.EMAIL,
+          OTP: otp,
         })
         .then(response => {
-          if (response.data.login == true) {
+          console.log('sadnsadjkasdasd', response.data);
+
+          if (response.data.LOGIN == true) {
             setVisible(false);
             dispatch({
               type: 'AUTH_DATA_GET',
               payload: {...response.data},
             });
 
-            if (toBoolean(response.data.NEW_USER) == true) {
+            if (response.data.NEW_USER == true) {
               navigation.navigate(PROFILE_EDIT, {
                 NEW_USER: true,
                 EMAIL: EMAIL,
               });
-            } else if (toBoolean(response.data.NEW_USER) == false) {
+            } else if (response.data.NEW_USER == false) {
               navigation.navigate(DASHBOARD);
             }
           } else {
@@ -139,13 +143,14 @@ const OTPVerification = props => {
           ))} */}
           <OTPInputView
             style={{width: '90%', height: 150, color: COLORS.black}}
-            pinCount={4}
+            pinCount={6}
             // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
             // onCodeChanged = {code => { this.setState({code})}}
             autoFocusOnLoad
             codeInputFieldStyle={styles.underlineStyleBase}
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
             onCodeFilled={code => {
+              setOtp(code);
               console.log(`Code is ${code}, you are good to go!`);
             }}
           />
@@ -212,6 +217,8 @@ const styles = StyleSheet.create({
     height: 45,
     borderWidth: 0,
     borderBottomWidth: 1,
+    color: '#000',
+    fontSize: 22,
   },
 
   underlineStyleHighLighted: {

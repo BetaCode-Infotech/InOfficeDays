@@ -17,6 +17,8 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import Icons from '../../../constants/Icons';
 import Header from '../../../components/Header/Header';
+import Axios from '../../utils/Axios';
+import axios from 'axios';
 
 const categoryOptions = [
   {label: 'Education', value: 'education', icon: Icons.email},
@@ -37,8 +39,8 @@ export default function AddGroup() {
   const [category, setCategory] = useState(null);
   const [frequency, setFrequency] = useState(null);
   const [milestoneDays, setMilestoneDays] = useState('');
-
   const [scaleValue] = useState(new Animated.Value(1));
+  const [errors, setErrors] = useState({});
 
   const handlePressIn = () => {
     Animated.spring(scaleValue, {
@@ -55,6 +57,41 @@ export default function AddGroup() {
     }).start();
   };
 
+  const onSave = async () => {
+    const newErrors = {};
+    if (!groupName.trim()) newErrors.groupName = 'Group name is required.';
+    if (!category) newErrors.category = 'Category is required.';
+    if (!frequency) newErrors.frequency = 'Milestone frequency is required.';
+    if (
+      !milestoneDays.trim() ||
+      isNaN(milestoneDays) ||
+      Number(milestoneDays) <= 0
+    ) {
+      newErrors.milestoneDays = 'Enter valid milestone days.';
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    // Dummy API call
+    axios
+      .post(Axios.axiosUrl + Axios.createGroups, {
+        GROUP_NAME: groupName,
+        CATEGORY_ID: category,
+        MILESTONE_FREQUENCY_ID: frequency,
+        MILESTONE_DAYS: Number(milestoneDays),
+        USER_ID: '68388b31488f92f58b452d35',
+      })
+      .then(response => {
+        console.log('Group Created');
+      })
+      .catch(err => {
+        console.log('Err', err);
+      });
+    // Optionally reset form or show success UI
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Header showBack title="Add Group" />
@@ -69,10 +106,16 @@ export default function AddGroup() {
               <TextInput
                 style={styles.cardInput}
                 value={groupName}
-                onChangeText={setGroupName}
+                onChangeText={text => {
+                  setGroupName(text);
+                  setErrors(prev => ({...prev, groupName: undefined}));
+                }}
                 placeholder="Enter group name"
                 placeholderTextColor="#aaa"
               />
+              {errors.groupName && (
+                <Text style={styles.errorText}>{errors.groupName}</Text>
+              )}
             </View>
 
             <View>
@@ -89,7 +132,10 @@ export default function AddGroup() {
                 valueField="value"
                 placeholder="Select Category"
                 value={category}
-                onChange={item => setCategory(item.value)}
+                onChange={item => {
+                  setCategory(item.value);
+                  setErrors(prev => ({...prev, category: undefined}));
+                }}
                 renderItem={item => (
                   <View style={styles.itemContainer}>
                     <Image source={item.icon} style={styles.itemIcon} />
@@ -103,6 +149,9 @@ export default function AddGroup() {
                   </View>
                 )}
               />
+              {errors.category && (
+                <Text style={styles.errorText}>{errors.category}</Text>
+              )}
             </View>
 
             <View>
@@ -119,7 +168,10 @@ export default function AddGroup() {
                 valueField="value"
                 placeholder="Select Category"
                 value={frequency}
-                onChange={item => setFrequency(item.value)}
+                onChange={item => {
+                  setFrequency(item.value);
+                  setErrors(prev => ({...prev, frequency: undefined}));
+                }}
                 renderItem={item => (
                   <View style={styles.itemContainer}>
                     <Image source={item.icon} style={styles.itemIcon} />
@@ -133,6 +185,9 @@ export default function AddGroup() {
                   </View>
                 )}
               />
+              {errors.frequency && (
+                <Text style={styles.errorText}>{errors.frequency}</Text>
+              )}
             </View>
 
             <View>
@@ -140,11 +195,17 @@ export default function AddGroup() {
               <TextInput
                 style={styles.cardInput}
                 value={milestoneDays}
-                onChangeText={setMilestoneDays}
+                onChangeText={text => {
+                  setMilestoneDays(text);
+                  setErrors(prev => ({...prev, milestoneDays: undefined}));
+                }}
                 placeholder="e.g. 7"
                 placeholderTextColor="#aaa"
                 keyboardType="number-pad"
               />
+              {errors.milestoneDays && (
+                <Text style={styles.errorText}>{errors.milestoneDays}</Text>
+              )}
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -164,7 +225,7 @@ export default function AddGroup() {
           <Pressable
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
-            onPress={() => console.log('Submit pressed')}
+            onPress={onSave}
             style={styles.bottomButton}>
             <Text style={styles.bottomButtonText}>Save</Text>
           </Pressable>
@@ -244,5 +305,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 13,
+    marginTop: 4,
   },
 });

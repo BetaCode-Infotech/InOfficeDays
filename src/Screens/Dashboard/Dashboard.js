@@ -19,7 +19,12 @@ import location from '../../../assets/icons/gps.png';
 import people from '../../../assets/icons/people.png';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Progress from 'react-native-progress';
-import {ADD_GROUP, ADD_LOCATION, GROUP} from '../../utils/Routes/Routes';
+import {
+  ADD_GROUP,
+  ADD_LOCATION,
+  GROUP,
+  PROFILE,
+} from '../../utils/Routes/Routes';
 import IconButton from '../../../components/IconButton/IconButton';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import {CategoryList} from '../../../constants/Fns';
@@ -197,6 +202,9 @@ export default function Dashboard() {
             width: 50,
             height: 50,
             marginHorizontal: 20,
+          }}
+          onPress={() => {
+            navigation.navigate(PROFILE);
           }}
         />
       </View>

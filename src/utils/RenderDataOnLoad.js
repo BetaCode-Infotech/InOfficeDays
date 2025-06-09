@@ -1,22 +1,20 @@
 import {useEffect} from 'react';
-import {connect} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {getSessionDataAction} from '../Redux/Action/getSessionData';
-import {getAllEventData} from '../Redux/Action/getAllEventData';
+import {
+  getGroupByUserData,
+  getLocationByUserData,
+} from '../Redux/Action/getAllGroupData';
 
-const RenderDataOnLoad = props => {
+export const RenderDataOnLoad = () => {
+  const dispatch = useDispatch();
+  const AUTH_DATA = useSelector(state => state.authData.authDataList);
+
   useEffect(() => {
-    if (props.AUTH_DATA?.SESSION_ID) {
-      props.getSessionDataAction(props.AUTH_DATA?.SESSION_ID);
-      // props.getAllEventData(props.AUTH_DATA?.USER_ID,);
-      // props.getMyEventData(props.AUTH_DATA?.SESSION_ID);
+    if (AUTH_DATA?.SESSION_ID) {
+      dispatch(getSessionDataAction(AUTH_DATA?.SESSION_ID));
+      dispatch(getGroupByUserData(AUTH_DATA?.USER_ID));
+      dispatch(getLocationByUserData(AUTH_DATA?.USER_ID));
     }
-  }, []);
+  }, [AUTH_DATA, dispatch]);
 };
-
-const mapStateToProps = state => ({
-  AUTH_DATA: state.authData.authDataList,
-});
-
-export default connect(mapStateToProps, {
-  getSessionDataAction,
-})(RenderDataOnLoad);
