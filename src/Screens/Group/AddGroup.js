@@ -11,6 +11,7 @@ import {
   Animated,
   Pressable,
   ScrollView,
+  Vibration,
 } from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useNavigation} from '@react-navigation/native';
@@ -19,6 +20,11 @@ import Icons from '../../../constants/Icons';
 import Header from '../../../components/Header/Header';
 import Axios from '../../utils/Axios';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
+import {toastConfig, toBoolean} from '../../../constants/Fns';
+
+const DURATION = 100;
+const PATTERN = [2 * DURATION, 1 * DURATION];
 
 const categoryOptions = [
   {label: 'Education', value: 'education', icon: Icons.email},
@@ -56,6 +62,13 @@ export default function AddGroup() {
       useNativeDriver: true,
     }).start();
   };
+  const resetForm = () => {
+    setGroupName('');
+    setCategory(null);
+    setFrequency(null);
+    setMilestoneDays('');
+    setErrors({});
+  }
 
   const onSave = async () => {
     const newErrors = {};
@@ -84,16 +97,40 @@ export default function AddGroup() {
         USER_ID: '68388b31488f92f58b452d35',
       })
       .then(response => {
+        Toast.show({
+          type: 'success',
+          text1: `Group Created`,
+          // text2: 'Please enter the correct OTP',
+        });
+                    Vibration.vibrate(PATTERN);
+                    resetForm()
         console.log('Group Created');
       })
       .catch(err => {
         console.log('Err', err);
+        Toast.show({
+          type: 'error',
+          text1: `Something went wrong`,
+          // text2: 'Please enter the correct OTP',
+        });
+        Vibration.vibrate(PATTERN);
       });
     // Optionally reset form or show success UI
   };
 
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <View
+                style={[
+                  {
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex:1000
+                  },
+                ]}>
+                <Toast position="top" topOffset={0} config={toastConfig} />
+              </View>
       <Header showBack title="Add Group" />
       <ScrollView
         style={{

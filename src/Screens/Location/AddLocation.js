@@ -14,14 +14,15 @@ import {
   Pressable,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import locationIcon from '../../../assets/icons/gps.png';
 import down from '../../../assets/icons/arrow_drop_down.png';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Header from '../../../components/Header/Header';
 import {Dropdown} from 'react-native-element-dropdown';
+import {connect} from 'react-redux';
 
-export default function AddLocation() {
+const AddLocation = props => {
   const navigation = useNavigation();
   const [locationName, setLocationName] = useState('');
   const [group, setGroup] = useState(null);
@@ -29,6 +30,7 @@ export default function AddLocation() {
   const [radius, setRadius] = useState('Select Radius');
   const [showDropdown, setShowDropdown] = useState(false);
   const [errors, setErrors] = useState({});
+  const [groupData, setGroupData] = useState([]);
 
   const groupOptions = [];
 
@@ -83,7 +85,10 @@ export default function AddLocation() {
       });
     console.log('Location saved:', {locationName, googleLocation, radius});
   };
-
+  useEffect(() => {
+    setGroupData(props.GROUP_DATA);
+    console.log('Group_Data:', props.GROUP_DATA);
+  }, [props.GROUP_DATA]);
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Header showBack={true} showHome={true} title="Add Location" />
@@ -97,7 +102,7 @@ export default function AddLocation() {
               placeholderStyle={styles.placeholderStyle}
               selectedTextStyle={styles.selectedTextStyle}
               iconStyle={styles.iconStyle}
-              data={groupOptions}
+              data={groupData}
               maxHeight={300}
               labelField="label"
               valueField="value"
@@ -208,7 +213,12 @@ export default function AddLocation() {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
+const mapStateToProps = state => ({
+  GROUP_DATA: state.groupData.groupList,
+});
+
+export default connect(mapStateToProps)(AddLocation);
 
 const styles = StyleSheet.create({
   mainContainer: {
