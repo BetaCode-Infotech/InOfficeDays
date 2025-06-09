@@ -9,6 +9,11 @@ export const getGroupByUserData = UserId => async dispatch => {
     })
     .then(response => {
       const data = response.data;
+      console.log('Group Data:', data);
+      data.map(val=>{
+        val.label = val.GROUP_NAME;
+        val.value = val._id;
+      })
       if (data.IS_LOGGED_OUT == false) {
         dispatch({
           type: 'ALL_GROUP_LIST',
