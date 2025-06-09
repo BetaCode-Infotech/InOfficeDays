@@ -91,19 +91,12 @@ const Profile = props => {
         backgroundColor: '#fff',
       }}>
       <ScrollView style={[styles.container]}>
-        {/* <StatusBar
-        translucent
-        animated={true}
-        backgroundColor="red"
-        barStyle='light-content' 
-      /> */}
-        {/* Banner */}
         <ImageBackground
           source={require('../../../assets/image/profile-view-bg.jpg')}
           resizeMode="cover">
           {state.type == 'stack' && (
             <IconButton
-              icon={Icons.back}
+              icon={Icons.home}
               containerStyle={{
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 width: 40,
@@ -115,7 +108,7 @@ const Profile = props => {
                 alignItems: 'center',
                 margin: 5,
               }}
-              iconStyle={{tintColor: '#fff'}}
+              iconStyle={{tintColor: '#fff', width: 25, height: 25}}
               onPress={() => navigation.navigate(DASHBOARD)}
             />
           )}
