@@ -130,8 +130,6 @@ const styles = StyleSheet.create({
   list: {paddingBottom: 16},
   accordionSection: {
     marginBottom: 10,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
     paddingBottom: 10,
   },
   accordionHeader: {
