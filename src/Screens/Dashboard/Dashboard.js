@@ -30,10 +30,11 @@ import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import {CategoryList} from '../../../constants/Fns';
 import Icons from '../../../constants/Icons';
 import {PieChart} from 'react-native-gifted-charts';
+import {connect} from 'react-redux';
 const {width} = Dimensions.get('window');
 const CARD_WIDTH = Math.min(width * 0.9);
 
-export default function Dashboard() {
+function Dashboard(props) {
   const [newUser, setNewUser] = useState(true);
   const navigation = useNavigation();
 
@@ -63,6 +64,12 @@ export default function Dashboard() {
       gradient: ['#5409DA', '#4E71FF'],
     },
   ]);
+
+  useEffect(() => {
+    if (props.GROUP_DATA.length > 0 && props.LOCATION_DATA.length > 0) {
+      setNewUser(false);
+    }
+  }, [props.GROUP_DATA, props.LOCATION_DATA]);
   const handlePin = selectedId => {
     const updatedData = milestonesData.map(item => ({
       ...item,
@@ -90,9 +97,7 @@ export default function Dashboard() {
   });
 
   const renderGroupCard = ({item, index}) => {
-    const categoryData = CategoryList.find(
-      cat => cat.CATEGORY_ID == item.CATEGORY,
-    );
+    const categoryData = CategoryList.find(cat => cat.value == item.CATEGORY);
 
     return (
       <TouchableWithoutFeedback
@@ -176,9 +181,7 @@ export default function Dashboard() {
           )}
 
           <View style={[styles.titleRow, {marginTop: 10}]}>
-            {categoryData.CATEGORY_ICON && (
-              <ImageIcon icon={categoryData.CATEGORY_ICON} />
-            )}
+            {categoryData.icon && <ImageIcon icon={categoryData.icon} />}
             <Text style={styles.badgeText}>Completed</Text>
           </View>
         </LinearGradient>
@@ -280,6 +283,14 @@ export default function Dashboard() {
     </View>
   );
 }
+
+const mapStateToProps = state => ({
+  AUTH_DATA: state.authData.authDataList,
+  GROUP_DATA: state.groupData.groupList,
+  LOCATION_DATA: state.locationData.locationList,
+});
+
+export default connect(mapStateToProps)(Dashboard);
 
 const styles = StyleSheet.create({
   container: {
