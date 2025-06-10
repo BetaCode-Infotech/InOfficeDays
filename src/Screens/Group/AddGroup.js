@@ -12,6 +12,7 @@ import {
   Pressable,
   ScrollView,
   Vibration,
+  ActivityIndicator,
 } from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useNavigation} from '@react-navigation/native';
@@ -22,6 +23,8 @@ import Axios from '../../utils/Axios';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import {toastConfig, toBoolean} from '../../../constants/Fns';
+import {connect} from 'react-redux';
+import {getGroupByUserData} from '../../Redux/Action/getAllGroupData';
 
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
@@ -38,7 +41,7 @@ const frequencyOptions = [
   {label: 'Quarterly', value: 'quarterly', icon: Icons.email},
 ];
 
-export default function AddGroup() {
+function AddGroup(props) {
   const navigation = useNavigation();
 
   const [groupName, setGroupName] = useState('');
@@ -47,6 +50,7 @@ export default function AddGroup() {
   const [milestoneDays, setMilestoneDays] = useState('');
   const [scaleValue] = useState(new Animated.Value(1));
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handlePressIn = () => {
     Animated.spring(scaleValue, {
@@ -68,7 +72,7 @@ export default function AddGroup() {
     setFrequency(null);
     setMilestoneDays('');
     setErrors({});
-  }
+  };
 
   const onSave = async () => {
     const newErrors = {};
@@ -85,29 +89,37 @@ export default function AddGroup() {
 
     setErrors(newErrors);
 
+    console.log('aksdlksadasd', {
+      GROUP_NAME: groupName,
+      CATEGORY_ID: category,
+      MILESTONE_FREQUENCY_ID: frequency,
+      MILESTONE_DAYS: Number(milestoneDays),
+      USER_ID: props.AUTH_DATA._id,
+    });
     if (Object.keys(newErrors).length > 0) return;
-
+    setLoading(true);
     // Dummy API call
-    axios
+    await axios
       .post(Axios.axiosUrl + Axios.createGroups, {
         GROUP_NAME: groupName,
         CATEGORY_ID: category,
         MILESTONE_FREQUENCY_ID: frequency,
         MILESTONE_DAYS: Number(milestoneDays),
-        USER_ID: '68388b31488f92f58b452d35',
+        USER_ID: props.AUTH_DATA?._id,
       })
       .then(response => {
+        setLoading(false);
+
         Toast.show({
           type: 'success',
           text1: `Group Created`,
-          // text2: 'Please enter the correct OTP',
         });
-                    Vibration.vibrate(PATTERN);
-                    resetForm()
-        console.log('Group Created');
+        Vibration.vibrate(PATTERN);
+        props.getGroupByUserData(props.AUTH_DATA?._id);
+        resetForm();
       })
       .catch(err => {
-        console.log('Err', err);
+        setLoading(false);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
@@ -121,16 +133,16 @@ export default function AddGroup() {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View
-                style={[
-                  {
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex:1000
-                  },
-                ]}>
-                <Toast position="top" topOffset={0} config={toastConfig} />
-              </View>
+        style={[
+          {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          },
+        ]}>
+        <Toast position="top" topOffset={0} config={toastConfig} />
+      </View>
       <Header showBack title="Add Group" />
       <ScrollView
         style={{
@@ -263,14 +275,28 @@ export default function AddGroup() {
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             onPress={onSave}
-            style={styles.bottomButton}>
-            <Text style={styles.bottomButtonText}>Save</Text>
+            disabled={loading} // 👈 disables Pressable when loading is true
+            style={({pressed}) => [
+              styles.bottomButton,
+              pressed && !loading && {opacity: 0.8},
+            ]}>
+            {loading ? (
+              <ActivityIndicator color={'#fff'} size={'small'} />
+            ) : (
+              <Text style={styles.bottomButtonText}>Save</Text>
+            )}
           </Pressable>
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const mapStateToProps = state => ({
+  AUTH_DATA: state.authData.authDataList,
+});
+
+export default connect(mapStateToProps, {getGroupByUserData})(AddGroup);
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -348,4 +374,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 4,
   },
+  // disabledButton: {
+  //   backgroundColor: '#999', // dimmed background
+  // },
 });
