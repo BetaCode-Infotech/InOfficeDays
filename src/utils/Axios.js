@@ -8,7 +8,7 @@ const updateGroup = 'inOffice/group/updateGroup';
 const createLocation = 'inOffice/location/createLocation';
 const updateLocation = 'inOffice/location/updateLocation';
 const getGroupByUser = 'inOffice/group/getGroupByUser';
-const getLocationByGroup = 'inOffice/location/getLocationByGroup';
+const getLocationByUser = 'inOffice/location/getLocationByUser';
 const userLogout = 'user/userLogout';
 export default {
   axiosUrl,
@@ -22,5 +22,5 @@ export default {
   updateLocation,
   userLogout,
   getGroupByUser,
-  getLocationByGroup,
+  getLocationByUser,
 };

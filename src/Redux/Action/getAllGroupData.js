@@ -2,9 +2,8 @@ import axios from 'axios';
 import Axios from '../../utils/Axios';
 
 export const getGroupByUserData = UserId => async dispatch => {
-  console.log('Asksadsadasd', UserId);
 
-  // if (!UserId) return 'No User ID provider';
+  if (!UserId) return 'No User ID provider';
   await axios
     .post(`${Axios.axiosUrl}${Axios.getGroupByUser}`, {
       USER_ID: UserId,
@@ -30,11 +29,13 @@ export const getGroupByUserData = UserId => async dispatch => {
 export const getLocationByUserData = UserId => async dispatch => {
   if (!UserId) return 'No User ID provider';
   await axios
-    .post(`${Axios.axiosUrl}${Axios.getLocationByGroup}`, {
+    .post(`${Axios.axiosUrl}${Axios.getLocationByUser}`, {
       USER_ID: UserId,
     })
     .then(response => {
       const data = response.data;
+      console.log('Asksadsadasd', data);
+
       // if (data.IS_LOGGED_OUT == false) {
       dispatch({
         type: 'ALL_LOCATION_LIST',
