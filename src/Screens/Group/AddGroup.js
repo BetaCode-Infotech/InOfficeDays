@@ -22,7 +22,7 @@ import Header from '../../../components/Header/Header';
 import Axios from '../../utils/Axios';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import {toastConfig, toBoolean} from '../../../constants/Fns';
+import {CategoryList, toastConfig, toBoolean} from '../../../constants/Fns';
 import {connect} from 'react-redux';
 import {getGroupByUserData} from '../../Redux/Action/getAllGroupData';
 
@@ -175,7 +175,7 @@ function AddGroup(props) {
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 iconStyle={styles.iconStyle}
-                data={categoryOptions}
+                data={CategoryList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"

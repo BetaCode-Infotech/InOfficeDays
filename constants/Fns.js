@@ -65,18 +65,18 @@ export function toBoolean(value) {
 
 export const CategoryList = [
   {
-    CATEGORY_ID: 1,
-    CATEGORY_NAME: 'Fitness',
-    CATEGORY_ICON: Icons.fitness,
+    label: 'Fitness',
+    value: 1,
+    icon: Icons.fitness,
   },
   {
-    CATEGORY_ID: 2,
-    CATEGORY_NAME: 'Office',
-    CATEGORY_ICON: Icons.workspace,
+    label: 'Office',
+    value: 2,
+    icon: Icons.workspace,
   },
   {
-    CATEGORY_ID: 3,
-    CATEGORY_NAME: 'Meet Girlfriend',
-    CATEGORY_ICON: Icons.hearts,
+    label: 'Meet Girlfriend',
+    value: 3,
+    icon: Icons.hearts,
   },
 ];
