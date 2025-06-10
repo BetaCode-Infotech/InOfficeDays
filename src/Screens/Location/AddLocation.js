@@ -12,15 +12,23 @@ import {
   ScrollView,
   Animated,
   Pressable,
+  Vibration,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
+import axios from 'axios';
+import Axios from '../../utils/Axios';
 import locationIcon from '../../../assets/icons/gps.png';
 import down from '../../../assets/icons/arrow_drop_down.png';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Header from '../../../components/Header/Header';
 import {Dropdown} from 'react-native-element-dropdown';
 import {connect} from 'react-redux';
+import Toast from 'react-native-toast-message';
+import {toastConfig, toBoolean} from '../../../constants/Fns';
+
+const DURATION = 100;
+const PATTERN = [2 * DURATION, 1 * DURATION];
 
 const AddLocation = props => {
   const navigation = useNavigation();
@@ -57,7 +65,13 @@ const AddLocation = props => {
       useNativeDriver: true,
     }).start();
   };
-
+  const resetForm = () => {
+    setLocationName('');
+    setGoogleLocation('');
+    setRadius('Select Radius');
+    setGroup(null);
+    setErrors({});
+  };
   const onSave = () => {
     const newErrors = {};
     if (!locationName.trim())
@@ -70,18 +84,28 @@ const AddLocation = props => {
 
     if (Object.keys(newErrors).length > 0) return;
     axios
-      .post(Axios.axiosUrl + Axios.createGroups, {
+      .post(Axios.axiosUrl + Axios.createLocation, {
         LOCATION_NAME: locationName,
         LOCATION: googleLocation,
         RADIUS: radius,
-        GROUP_ID: '',
-        USER_ID: '68388b31488f92f58b452d35',
+        GROUP_ID: group,
+        USER_ID: props.AUTH_DATA?._id,
       })
       .then(response => {
-        console.log('Group Created');
+        Toast.show({
+          type: 'success',
+          text1: `Location Created`,
+        });
+        Vibration.vibrate(PATTERN);
+        resetForm();
       })
       .catch(err => {
         console.log('Err', err);
+        Toast.show({
+          type: 'error',
+          text1: `Something went wrong`,
+        });
+        Vibration.vibrate(PATTERN);
       });
     console.log('Location saved:', {locationName, googleLocation, radius});
   };
@@ -91,6 +115,17 @@ const AddLocation = props => {
   }, [props.GROUP_DATA]);
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <View
+        style={[
+          {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          },
+        ]}>
+        <Toast position="top" topOffset={0} config={toastConfig} />
+      </View>
       <Header showBack={true} showHome={true} title="Add Location" />
       <ScrollView style={{paddingHorizontal: 10}}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
