@@ -25,9 +25,8 @@ import ProfileEdit from '../../Screens/Profile/ProfileEdit';
 const Stack = createNativeStackNavigator();
 const StackNavigator = props => {
   const [initialRoute, setInitialRoute] = useState(null);
-
   useEffect(() => {
-    if (props.AUTH_DATA?.USER_ID) {
+    if (props.AUTH_DATA?._id) {
       if (props.AUTH_DATA?.NEW_USER === true) {
         setInitialRoute(PROFILE_EDIT);
       } else {
