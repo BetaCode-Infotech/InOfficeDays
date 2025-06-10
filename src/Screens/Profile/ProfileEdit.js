@@ -30,6 +30,8 @@ const ProfileEdit = props => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  console.log('asdknasdas', props.AUTH_DATA);
+
   useEffect(() => {
     if (props.AUTH_DATA) {
       setName(props.AUTH_DATA?.USER_NAME || '');
@@ -88,9 +90,14 @@ const ProfileEdit = props => {
             type: 'success',
             text1: `Profile Updated`,
           });
+          console.log('sdkmaskdlasdasd', {
+            ...props.AUTH_DATA,
+            ...response.data,
+          });
+
           dispatch({
             type: 'AUTH_DATA_GET',
-            payload: {...response.data},
+            payload: {...props.AUTH_DATA, ...response.data},
           });
           if (newUser) {
             navigation.navigate(DASHBOARD);
