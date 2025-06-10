@@ -4,6 +4,7 @@ import Header from '../../../components/Header/Header';
 import {CategoryList} from '../../../constants/Fns';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import {useRoute} from '@react-navigation/native';
+import {connect} from 'react-redux';
 
 // Group items by GROUP_ID
 const groupByGroupId = data => {
@@ -25,67 +26,15 @@ const groupByGroupId = data => {
   }));
 };
 
-
-const ViewLocations = () => {
+const ViewLocations = props => {
   const route = useRoute();
   const passedGroupId = route.params?.groupId || null;
 
-  const [allLocationList] = useState([
-    {
-      KEY: 'MS001',
-      GROUP_ID: 'G001',
-      GROUP_NAME: 'Hit Gym',
-      LOCATION_NAME: 'Hit Gym',
-      CATEGORY: 1,
-      LOCATION: 'Mumbai',
-      RADIUS: 15,
-    },
-    {
-      KEY: 'MS002',
-      GROUP_ID: 'G001',
-      GROUP_NAME: 'Hit Gym',  
-      LOCATION_NAME: 'Hit Gym Branch 2',
-      CATEGORY: 1,
-      LOCATION: 'Pune',
-      RADIUS: 12,
-    },
-    {
-      KEY: 'MS003',
-      GROUP_ID: 'G002',
-      GROUP_NAME: 'Engineering Team', 
-      LOCATION_NAME: 'Engineering Team',
-      CATEGORY: 3,
-      LOCATION: 'Bangalore',
-      RADIUS: 7,
-    },
-    {
-      KEY: 'MS004',
-      GROUP_ID: 'G002',
-      GROUP_NAME: 'Engineering Team', 
-      LOCATION_NAME: 'Engineering Floor 2',
-      CATEGORY: 3,
-      LOCATION: 'Bangalore',
-      RADIUS: 9,
-    },
-    {
-      KEY: 'MS005',
-      GROUP_ID: 'G003',
-      GROUP_NAME: 'HR Department',
-      LOCATION_NAME: 'HR Department',
-      CATEGORY: 2,
-      LOCATION: 'Delhi',
-      RADIUS: 30,
-    },
-    {
-      KEY: 'MS006',
-      GROUP_ID: 'G004',
-      GROUP_NAME: 'Product Team',
-      LOCATION_NAME: 'Product Team',
-      CATEGORY: 3,
-      LOCATION: 'Hyderabad',
-      RADIUS: 7,
-    },
-  ]);
+  useEffect(() => {
+    setAllLocationList(props.LOCATION_DATA);
+  }, [props.LOCATION_DATA]);
+
+  const [allLocationList, setAllLocationList] = useState([]);
 
   useEffect(() => {
     const defaultExpanded = {};
@@ -152,7 +101,7 @@ const ViewLocations = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="View Locations" showBack  />
+      <Header title="View Locations" showBack />
       <FlatList
         data={groupedLocations}
         keyExtractor={item => item.GROUP_ID}
@@ -161,9 +110,7 @@ const ViewLocations = () => {
             <TouchableOpacity
               onPress={() => toggleGroup(item.GROUP_ID)}
               style={styles.accordionHeader}>
-              <Text style={styles.accordionTitle}>
-                 {item.GROUP_NAME}
-              </Text>
+              <Text style={styles.accordionTitle}>{item.GROUP_NAME}</Text>
               <Text style={{fontSize: 18}}>
                 {expandedGroups[item.GROUP_ID] ? '−' : '+'}
               </Text>
@@ -225,4 +172,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ViewLocations;
+const mapStateToProps = state => ({
+  AUTH_DATA: state.authData.authDataList,
+  LOCATION_DATA: state.locationData.locationList,
+});
+
+export default connect(mapStateToProps)(ViewLocations);

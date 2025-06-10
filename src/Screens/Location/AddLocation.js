@@ -269,6 +269,7 @@ const AddLocation = props => {
 };
 const mapStateToProps = state => ({
   GROUP_DATA: state.groupData.groupList,
+  AUTH_DATA: state.authData.authDataList,
 });
 
 export default connect(mapStateToProps, {getLocationByUserData})(AddLocation);

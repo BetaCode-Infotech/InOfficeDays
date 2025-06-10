@@ -11,6 +11,8 @@ export const RenderDataOnLoad = () => {
   const AUTH_DATA = useSelector(state => state.authData.authDataList);
 
   useEffect(() => { 
+    console.log('asdjasjlkdsadasd', AUTH_DATA);
+    
     if (AUTH_DATA?.SESSION_ID) {
       dispatch(getSessionDataAction(AUTH_DATA?.SESSION_ID));
     }
@@ -20,5 +22,5 @@ export const RenderDataOnLoad = () => {
       dispatch(getGroupByUserData(AUTH_DATA?._id));
       dispatch(getLocationByUserData(AUTH_DATA?._id));
     }
-  }, [AUTH_DATA, dispatch]);
+  }, [AUTH_DATA]);
 };
