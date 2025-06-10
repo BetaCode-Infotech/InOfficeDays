@@ -10,7 +10,7 @@ export const RenderDataOnLoad = () => {
   const dispatch = useDispatch();
   const AUTH_DATA = useSelector(state => state.authData.authDataList);
 
-  useEffect(() => {
+  useEffect(() => { 
     if (AUTH_DATA?.SESSION_ID) {
       dispatch(getSessionDataAction(AUTH_DATA?.SESSION_ID));
     }

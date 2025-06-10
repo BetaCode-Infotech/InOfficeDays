@@ -13,6 +13,7 @@ import {
   Animated,
   Pressable,
   Vibration,
+  ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
@@ -26,6 +27,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {connect} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {toastConfig, toBoolean} from '../../../constants/Fns';
+import {getLocationByUserData} from '../../Redux/Action/getAllGroupData';
 
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
@@ -39,6 +41,7 @@ const AddLocation = props => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [errors, setErrors] = useState({});
   const [groupData, setGroupData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const groupOptions = [];
 
@@ -83,6 +86,8 @@ const AddLocation = props => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) return;
+    setLoading(true);
+
     axios
       .post(Axios.axiosUrl + Axios.createLocation, {
         LOCATION_NAME: locationName,
@@ -92,6 +97,8 @@ const AddLocation = props => {
         USER_ID: props.AUTH_DATA?._id,
       })
       .then(response => {
+        setLoading(false);
+
         Toast.show({
           type: 'success',
           text1: `Location Created`,
@@ -100,12 +107,15 @@ const AddLocation = props => {
         resetForm();
       })
       .catch(err => {
+        setLoading(false);
+
         console.log('Err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
         });
         Vibration.vibrate(PATTERN);
+        props.getLocationByUserData(props.AUTH_DATA?._id);
       });
     console.log('Location saved:', {locationName, googleLocation, radius});
   };
@@ -238,8 +248,16 @@ const AddLocation = props => {
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
                   onPress={onSave}
-                  style={styles.bottomButton}>
-                  <Text style={styles.bottomButtonText}>Save</Text>
+                  disabled={loading} // 👈 disables Pressable when loading is true
+                  style={({pressed}) => [
+                    styles.bottomButton,
+                    pressed && !loading && {opacity: 0.8},
+                  ]}>
+                  {loading ? (
+                    <ActivityIndicator color={'#fff'} size={'small'} />
+                  ) : (
+                    <Text style={styles.bottomButtonText}>Save</Text>
+                  )}
                 </Pressable>
               </Animated.View>
             </View>
@@ -253,7 +271,7 @@ const mapStateToProps = state => ({
   GROUP_DATA: state.groupData.groupList,
 });
 
-export default connect(mapStateToProps)(AddLocation);
+export default connect(mapStateToProps, {getLocationByUserData})(AddLocation);
 
 const styles = StyleSheet.create({
   mainContainer: {
