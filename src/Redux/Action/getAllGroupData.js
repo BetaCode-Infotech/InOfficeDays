@@ -9,17 +9,14 @@ export const getGroupByUserData = UserId => async dispatch => {
     })
     .then(response => {
       const data = response.data;
-      console.log('Group Data:', data);
       data.map(val => {
         val.label = val.GROUP_NAME;
         val.value = val._id;
       });
-      // if (data.IS_LOGGED_OUT == false) {
       dispatch({
         type: 'ALL_GROUP_LIST',
         payload: data,
       });
-      // }
     })
     .catch(err => {
       console.error('Failed to fetch session data:', err);
@@ -27,18 +24,12 @@ export const getGroupByUserData = UserId => async dispatch => {
 };
 export const getLocationByUserData = UserId => async dispatch => {
   if (!UserId) return 'No User ID provider';
-  console.log('Asdjasdjasdas', `${Axios.axiosUrl}${Axios.getLocationByUser}`, {
-    USER_ID: UserId,
-  });
-  
   await axios
     .post(`${Axios.axiosUrl}${Axios.getLocationByUser}`, {
       USER_ID: UserId,
     })
     .then(response => {
       const data = response.data;
-      console.log('jhkjnjkhkjh', data);
-      
       dispatch({
         type: 'ALL_LOCATION_LIST',
         payload: data,
@@ -48,3 +39,43 @@ export const getLocationByUserData = UserId => async dispatch => {
       console.error('Failed to fetch session data:', err);
     });
 };
+export const getTrackingByUserData = UserId => async dispatch => {
+  if (!UserId) return 'No User ID provider';
+  await axios
+    .post(`${Axios.axiosUrl}${Axios.getTrackingByUser}`, {
+      USER_ID: UserId,
+    })
+    .then(response => {
+      const data = response.data;
+
+      dispatch({
+        type: 'ALL_TRACKING_LIST',
+        payload: data,
+      });
+    })
+    .catch(err => {
+      console.error('Failed to fetch session data:', err);
+    });
+};
+export const getHistoryByTrackingID =
+  (TrackingId, UserId) => async dispatch => {
+    // if (!TrackingId) return {error: 'No Tracking ID provided'};
+    console.log("ASdkamsdasd",TrackingId,UserId);
+    
+    try {
+      const response = await axios.post(
+        `${Axios.axiosUrl}${Axios.getTrackingHistory}`,
+        {
+          TRACKING_ID: TrackingId,
+          USER_ID: UserId,
+        },
+      );
+      const data = response.data;
+      console.log('Tracking History:', data);
+
+      return {data};
+    } catch (error) {
+      console.error('Failed to fetch tracking history:', error);
+      return {error};
+    }
+  };

@@ -4,6 +4,7 @@ import {getSessionDataAction} from '../Redux/Action/getSessionData';
 import {
   getGroupByUserData,
   getLocationByUserData,
+  getTrackingByUserData,
 } from '../Redux/Action/getAllGroupData';
 
 export const RenderDataOnLoad = () => {
@@ -21,6 +22,7 @@ export const RenderDataOnLoad = () => {
     if (AUTH_DATA?._id) {
       dispatch(getGroupByUserData(AUTH_DATA?._id));
       dispatch(getLocationByUserData(AUTH_DATA?._id));
+      dispatch(getTrackingByUserData(AUTH_DATA?._id));
     }
   }, [AUTH_DATA]);
 };

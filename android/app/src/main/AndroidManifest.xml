@@ -19,13 +19,13 @@
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
-                    android:value="false"/>
-        <!-- Change the resource name to your App's accent color - or any other color you want -->
-         <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
-                    android:resource="@color/white"/>
-                     <meta-data
+      android:value="false"/>
+      <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
+      android:resource="@color/white"/>
+      <meta-data
      android:name="com.google.android.geo.API_KEY"
      android:value="AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA"/>
+     
  
     
 

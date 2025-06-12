@@ -22,6 +22,7 @@ const pinBorder = require('../assets/icons/pin-border.png');
 const pinFilled = require('../assets/icons/pin-filled.png');
 const locationGroup = require('../assets/icons/locations-group.png');
 const updownArrow = require('../assets/icons/up-and-down-arrow.png');
+const optionsDots = require('../assets/icons/options-dots.png');
 
 export default {
   account,
@@ -47,5 +48,6 @@ export default {
   group,
   locationGroup,
   pinBorder,
+  optionsDots,
   pinFilled,
 };

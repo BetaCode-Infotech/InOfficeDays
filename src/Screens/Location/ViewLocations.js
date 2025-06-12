@@ -3,8 +3,10 @@ import React, {useState, useMemo, useEffect} from 'react';
 import Header from '../../../components/Header/Header';
 import {CategoryList} from '../../../constants/Fns';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {connect} from 'react-redux';
+import Icons from '../../../constants/Icons';
+import {ADD_LOCATION} from '../../utils/Routes/Routes';
 
 // Group items by GROUP_ID
 const groupByGroupId = data => {
@@ -28,6 +30,8 @@ const groupByGroupId = data => {
 
 const ViewLocations = props => {
   const route = useRoute();
+  const navigation = useNavigation();
+
   const passedGroupId = route.params?.groupId || null;
 
   useEffect(() => {
@@ -73,7 +77,7 @@ const ViewLocations = props => {
 
   const renderLocation = item => {
     const categoryData = CategoryList.find(
-      cat => cat.CATEGORY_ID === item.CATEGORY,
+      cat => cat.value == item.CATEGORY_ID,
     );
     return (
       <View key={item.KEY} style={styles.card}>
@@ -84,10 +88,10 @@ const ViewLocations = props => {
             <Text>Radius: {item.RADIUS} km</Text>
           </View>
           <View style={styles.iconContainer}>
-            {categoryData?.CATEGORY_ICON && (
+            {categoryData?.icon && (
               <>
                 <ImageIcon
-                  icon={categoryData.CATEGORY_ICON}
+                  icon={categoryData.icon}
                   iconStyle={{height: 60, width: 60}}
                 />
                 <Text>{categoryData?.CATEGORY_NAME}</Text>
@@ -102,9 +106,47 @@ const ViewLocations = props => {
   return (
     <View style={styles.container}>
       <Header title="View Locations" showBack />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+        }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ADD_LOCATION)}
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#000',
+            alignItems: 'center',
+            width: 150,
+            borderRadius: 10,
+            padding: 10,
+          }}>
+          <Text
+            style={{
+              color: '#fff',
+            }}>
+            {' '}
+            Add Location{' '}
+          </Text>
+          <ImageIcon
+            icon={Icons.locationGroup}
+            iconStyle={{
+              width: 30,
+              height: 30,
+              tintColor: '#fff',
+            }}
+            containerStyle={{
+              borderRadius: 50,
+              marginHorizontal: 10,
+            }}
+          />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={groupedLocations}
-        keyExtractor={item => item.GROUP_ID}
+        keyExtractor={item => item._id}
         renderItem={({item}) => (
           <View style={styles.accordionSection}>
             <TouchableOpacity
