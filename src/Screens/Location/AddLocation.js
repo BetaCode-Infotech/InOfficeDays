@@ -14,9 +14,10 @@ import {
   Pressable,
   Vibration,
   ActivityIndicator,
+  PermissionsAndroid,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {use, useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import Axios from '../../utils/Axios';
 import locationIcon from '../../../assets/icons/gps.png';
@@ -31,17 +32,28 @@ import {
   getLocationByUserData,
   getTrackingByUserData,
 } from '../../Redux/Action/getAllGroupData';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import MapView, {Circle, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import Geolocation from '@react-native-community/geolocation'; // Install this if not already
+
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA';
 
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
+
+const radiusOptions = [
+  {label: '50 M', value: 50, icon: locationIcon},
+  {label: '100 M', value: 100, icon: locationIcon},
+  {label: '200 M', value: 200, icon: locationIcon},
+  {label: '500 M', value: 500, icon: locationIcon},
+  {label: '1000 M', value: 1000, icon: locationIcon},
+];
 
 const AddLocation = props => {
   const navigation = useNavigation();
   const [locationName, setLocationName] = useState('');
   const [group, setGroup] = useState(null);
   const [googleLocation, setGoogleLocation] = useState('');
-  const [radius, setRadius] = useState('Select Radius');
+  const [radius, setRadius] = useState(radiusOptions[0].value);
   const [showDropdown, setShowDropdown] = useState(false);
   const [errors, setErrors] = useState({});
   const [groupData, setGroupData] = useState([]);
@@ -55,16 +67,13 @@ const AddLocation = props => {
     longitudeDelta: 0.0121,
   });
 
+  useEffect(() => {
+    goToMyLocation();
+  }, []);
+
   const mapRef = useRef(null);
 
   const groupOptions = [];
-
-  const radiusOptions = [
-    {label: '500m', icon: locationIcon},
-    {label: '1km', icon: locationIcon},
-    {label: '5km', icon: locationIcon},
-    {label: '10km', icon: locationIcon},
-  ];
 
   const [scaleValue] = useState(new Animated.Value(1));
 
@@ -93,8 +102,7 @@ const AddLocation = props => {
     const newErrors = {};
     if (!locationName.trim())
       newErrors.locationName = 'Location name is required.';
-    if (!googleLocation.trim())
-      newErrors.googleLocation = 'Location is required.';
+    if (!googleLocation) newErrors.googleLocation = 'Location is required.';
     if (radius === 'Select Radius') newErrors.radius = 'Radius is required.';
 
     setErrors(newErrors);
@@ -141,15 +149,14 @@ const AddLocation = props => {
   const handleMapPress = event => {
     const {coordinate} = event.nativeEvent;
     getPlaceName(coordinate.latitude, coordinate.longitude);
-    console.log('asdmaksdasdas', coordinate, event.nativeEvent);
 
-    setMarkerCoordinate(coordinate); // Update marker position
+    setGoogleLocation(coordinate); // Update marker position
   };
 
   const getPlaceName = async (latitude, longitude) => {
     const lat = latitude;
     const lng = longitude;
-    const apiKey = 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA';
+    const apiKey = GOOGLE_MAPS_API_KEY;
     console.log('asdasdasdasasds', apiKey);
 
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
@@ -160,13 +167,45 @@ const AddLocation = props => {
       if (data.status === 'OK') {
         const address = data.results[0]?.formatted_address;
         console.log('Place name:', address);
-        setGoogleLocation(address);
+        setLocationName(address);
         return address;
       } else {
         console.error('Geocoding error:', data.status);
       }
     } catch (error) {
       console.error('Fetch error:', error);
+    }
+  };
+
+  const goToMyLocation = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.warn('Location permission denied');
+          return;
+        }
+      }
+      Geolocation.getCurrentPosition(
+        position => {
+          const {latitude, longitude} = position.coords;
+          const region = {
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          };
+          setRegion(region);
+          setGoogleLocation({latitude, longitude});
+          getPlaceName(latitude, longitude);
+        },
+        error => console.error(error.message),
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -220,10 +259,11 @@ const AddLocation = props => {
             )}
             <Text style={[styles.label, {marginTop: 20}]}>Location Name *</Text>
             <TextInput
-              style={styles.cardInput}
+              style={[styles.cardInput, {backgroundColor: '#eee'}]}
               placeholder="Enter location name"
               placeholderTextColor="#aaa"
               value={locationName}
+              editable={false}
               onChangeText={text => {
                 setLocationName(text);
                 setErrors(prev => ({...prev, locationName: undefined}));
@@ -233,8 +273,7 @@ const AddLocation = props => {
               <Text style={styles.errorText}>{errors.locationName}</Text>
             )}
 
-            {/* Google Location */}
-            <Text style={[styles.label, {marginTop: 20}]}>Location *</Text>
+            {/* <Text style={[styles.label, {marginTop: 20}]}>Location *</Text>
             <TextInput
               style={[styles.cardInput, {backgroundColor: '#eee'}]}
               placeholder="Select Location from Maps"
@@ -249,7 +288,7 @@ const AddLocation = props => {
             />
             {errors.googleLocation && (
               <Text style={styles.errorText}>{errors.googleLocation}</Text>
-            )}
+            )} */}
 
             {/* Radius Dropdown */}
             <Text style={[styles.label, {marginTop: 20}]}>Radius *</Text>
@@ -261,11 +300,11 @@ const AddLocation = props => {
               data={radiusOptions}
               maxHeight={300}
               labelField="label"
-              valueField="label"
+              valueField="value"
               placeholder="Select Radius"
               value={radius === 'Select Radius' ? null : radius}
               onChange={item => {
-                setRadius(item.label);
+                setRadius(item.value);
                 setErrors(prev => ({...prev, radius: undefined}));
               }}
               renderItem={item => (
@@ -286,7 +325,7 @@ const AddLocation = props => {
             )}
             <View style={styles.container}>
               {/* Search Bar */}
-              <GooglePlacesAutocomplete
+              {/* <GooglePlacesAutocomplete
                 placeholder="Search for a location"
                 fetchDetails={true}
                 onPress={(data, details = null) => {
@@ -300,8 +339,10 @@ const AddLocation = props => {
                   setRegion(newRegion);
                   mapRef.current.animateToRegion(newRegion, 1000);
                 }}
+                onFail={error => console.error('Search failed:', error)}
+                onNotFound={() => console.warn('No results found')}
                 query={{
-                  key: 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA',
+                  key: GOOGLE_MAPS_API_KEY,
                   language: 'en',
                 }}
                 styles={{
@@ -309,30 +350,43 @@ const AddLocation = props => {
                     position: 'absolute',
                     top: 10,
                     width: '100%',
-                    zIndex: 1,
+                    zIndex: 1000, // ✅ Higher than MapView
                   },
                   listView: {
-                    backgroundColor: 'red',
-                    color: 'black',
+                    backgroundColor: 'white', // ✅ Use white, not red for better UX
+                    zIndex: 1000,
                   },
                 }}
-              />
-
+              /> */}
               {/* Map View */}
               <View style={styles.mapsContainer}>
                 <MapView
                   provider={PROVIDER_GOOGLE} // remove if not using Google Maps
                   style={styles.map}
-                  region={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.015,
-                    longitudeDelta: 0.0121,
-                  }}
+                  region={region}
                   onPress={handleMapPress} // Handle tap
-                >
-                  {markerCoordinate && <Marker coordinate={markerCoordinate} />}
+                  zoomControlEnabled
+                  zoomTapEnabled
+                  zoomEnabled>
+                  {googleLocation && (
+                    <>
+                      <Marker coordinate={googleLocation} />
+                      {Number(radius) > 0 && (
+                        <Circle
+                          center={googleLocation}
+                          radius={Number(radius)} // in meters
+                          strokeColor="rgba(0, 122, 255, 0.5)"
+                          fillColor="rgba(0, 122, 255, 0.2)"
+                        />
+                      )}
+                    </>
+                  )}
                 </MapView>
+                <TouchableOpacity
+                  style={styles.locationButton}
+                  onPress={goToMyLocation}>
+                  <Text style={styles.locationButtonText}>📍</Text>
+                </TouchableOpacity>
               </View>
             </View>
             {/* Submit Button */}
@@ -422,7 +476,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   bottomButtonContainer: {
-    marginTop: 40,
+    marginTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -457,5 +511,21 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  locationButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    padding: 12,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
+  },
+  locationButtonText: {
+    fontSize: 20,
   },
 });

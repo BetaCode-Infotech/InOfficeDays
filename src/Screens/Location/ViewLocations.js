@@ -23,7 +23,7 @@ import axios from 'axios';
 import Axios from '../../utils/Axios';
 import Toast from 'react-native-toast-message';
 import {toastConfig, toBoolean} from '../../../constants/Fns';
-import { getLocationByUserData } from '../../Redux/Action/getAllGroupData';
+import {getLocationByUserData} from '../../Redux/Action/getAllGroupData';
 // Group items by GROUP_ID
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
@@ -98,7 +98,6 @@ const ViewLocations = props => {
         props.getLocationByUserData(props.AUTH_DATA?._id);
       })
       .catch(err => {
-
         console.log('Err', err);
         Toast.show({
           type: 'error',
@@ -174,9 +173,9 @@ const ViewLocations = props => {
       //     </View>
       //   </View>
       // </View>
-      <View key={item.KEY} style={styles.card}>
+      <View key={`location-${item._id}`} style={styles.card}>
         {/* Top-right IconButton */}
-       
+
         <TouchableOpacity
           ref={optionsIconRef}
           style={styles.optionsIconContainer}
@@ -283,7 +282,7 @@ const ViewLocations = props => {
       </View>
       <FlatList
         data={groupedLocations}
-        keyExtractor={item => item._id}
+        keyExtractor={item => `group-${item._id}`}
         renderItem={({item}) => (
           <View style={styles.accordionSection}>
             <TouchableOpacity

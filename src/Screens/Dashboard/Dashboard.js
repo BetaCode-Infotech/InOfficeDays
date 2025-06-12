@@ -253,7 +253,7 @@ function Dashboard(props) {
           }}
           containerStyle={{
             backgroundColor: '#BFD3F9',
-            padding: 5,
+            padding: 3,
             borderRadius: 50,
             width: 50,
             height: 50,

@@ -60,8 +60,7 @@ export const getTrackingByUserData = UserId => async dispatch => {
 export const getHistoryByTrackingID =
   (TrackingId, UserId) => async dispatch => {
     // if (!TrackingId) return {error: 'No Tracking ID provided'};
-    console.log("ASdkamsdasd",TrackingId,UserId);
-    
+
     try {
       const response = await axios.post(
         `${Axios.axiosUrl}${Axios.getTrackingHistory}`,
