@@ -153,29 +153,7 @@ const ViewLocations = props => {
       cat => cat.value == item.CATEGORY_ID,
     );
     return (
-      // <View key={item.KEY} style={styles.card}>
-      //   <View style={styles.cardContent}>
-      //     <View>
-      //       <Text style={styles.title}>{item.LOCATION_NAME}</Text>
-      //       <Text style={styles.location}>Location: {item.LOCATION}</Text>
-      //       <Text>Radius: {item.RADIUS}</Text>
-      //     </View>
-      //     <View style={styles.iconContainer}>
-      //       {categoryData?.icon && (
-      //         <>
-      //           <ImageIcon
-      //             icon={categoryData.icon}
-      //             iconStyle={{height: 60, width: 60}}
-      //           />
-      //           <Text>{categoryData?.CATEGORY_NAME}</Text>
-      //         </>
-      //       )}
-      //     </View>
-      //   </View>
-      // </View>
       <View key={`location-${item._id}`} style={styles.card}>
-        {/* Top-right IconButton */}
-
         <TouchableOpacity
           ref={optionsIconRef}
           style={styles.optionsIconContainer}
@@ -191,9 +169,9 @@ const ViewLocations = props => {
 
         <View style={styles.cardContent}>
           <View>
-            <Text style={styles.title}>{item.LOCATION_NAME}</Text>
-            <Text style={styles.location}>Location: {item.LOCATION}</Text>
-            <Text>Radius: {item.RADIUS}</Text>
+            <Text style={styles.location}>{item.LOCATION_NAME}</Text>
+            {/* <Text style={styles.location}>Location: {item.LOCATION}</Text> */}
+            <Text>Radius: {item.RADIUS} M</Text>
           </View>
 
           <View style={styles.iconContainer}>
@@ -384,6 +362,7 @@ const styles = StyleSheet.create({
   },
   location: {
     maxWidth: '80%',
+    fontWeight: 600,
   },
   popover: {
     // position: 'absolute',
