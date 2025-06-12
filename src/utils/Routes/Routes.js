@@ -14,3 +14,4 @@ export const ADD_GROUP = 'add-group';
 export const ADD_LOCATION = 'add-location';
 export const VIEW_LOCATION = 'view-location';
 export const VIEW_GROUP = 'view-group';
+export const TRACKING_HISTORY = 'tracking-history';

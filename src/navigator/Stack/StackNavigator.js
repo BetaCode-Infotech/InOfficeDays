@@ -13,6 +13,7 @@ import {
   PROFILE,
   PROFILE_EDIT,
   SIGNIN,
+  TRACKING_HISTORY,
 } from '../../utils/Routes/Routes';
 import BottomTabNavigator from '../BottomNavigator/BottomNavigator';
 import AddLocation from '../../Screens/Location/AddLocation';
@@ -22,6 +23,7 @@ import OTPVerification from '../../Screens/OTPVerification/OTPVerification';
 import Profile from '../../Screens/Profile/Profile';
 import OnBoarding from '../../Screens/OnBoarding/OnBoarding';
 import ProfileEdit from '../../Screens/Profile/ProfileEdit';
+import TrackingHistory from '../../Screens/TrackingHistory/TrackingHistory';
 const Stack = createNativeStackNavigator();
 const StackNavigator = props => {
   const [initialRoute, setInitialRoute] = useState(null);
@@ -79,6 +81,11 @@ const StackNavigator = props => {
         <Stack.Screen
           name={ADD_LOCATION}
           component={AddLocation}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={TRACKING_HISTORY}
+          component={TrackingHistory}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

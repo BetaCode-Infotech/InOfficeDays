@@ -16,7 +16,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import Axios from '../../utils/Axios';
 import locationIcon from '../../../assets/icons/gps.png';
@@ -27,7 +27,12 @@ import {Dropdown} from 'react-native-element-dropdown';
 import {connect} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {toastConfig, toBoolean} from '../../../constants/Fns';
-import {getLocationByUserData} from '../../Redux/Action/getAllGroupData';
+import {
+  getLocationByUserData,
+  getTrackingByUserData,
+} from '../../Redux/Action/getAllGroupData';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import Config from 'react-native-config';
 
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
@@ -42,6 +47,16 @@ const AddLocation = props => {
   const [errors, setErrors] = useState({});
   const [groupData, setGroupData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [markerCoordinate, setMarkerCoordinate] = useState(null);
+
+  const [region, setRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.015,
+    longitudeDelta: 0.0121,
+  });
+
+  const mapRef = useRef(null);
 
   const groupOptions = [];
 
@@ -104,6 +119,8 @@ const AddLocation = props => {
           text1: `Location Created`,
         });
         Vibration.vibrate(PATTERN);
+        props.getLocationByUserData(props.AUTH_DATA?._id);
+        props.getTrackingByUserData(props.AUTH_DATA?._id);
         resetForm();
       })
       .catch(err => {
@@ -115,7 +132,6 @@ const AddLocation = props => {
           text1: `Something went wrong`,
         });
         Vibration.vibrate(PATTERN);
-        props.getLocationByUserData(props.AUTH_DATA?._id);
       });
     console.log('Location saved:', {locationName, googleLocation, radius});
   };
@@ -123,6 +139,38 @@ const AddLocation = props => {
     setGroupData(props.GROUP_DATA);
     console.log('Group_Data:', props.GROUP_DATA);
   }, [props.GROUP_DATA]);
+  const handleMapPress = event => {
+    const {coordinate} = event.nativeEvent;
+    getPlaceName(coordinate.latitude, coordinate.longitude);
+    console.log('asdmaksdasdas', coordinate, event.nativeEvent);
+
+    setMarkerCoordinate(coordinate); // Update marker position
+  };
+
+  const getPlaceName = async (latitude, longitude) => {
+    const lat = latitude;
+    const lng = longitude;
+    const apiKey = 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA';
+    console.log('asdasdasdasasds', apiKey);
+
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === 'OK') {
+        const address = data.results[0]?.formatted_address;
+        console.log('Place name:', address);
+        setGoogleLocation(address);
+        return address;
+      } else {
+        console.error('Geocoding error:', data.status);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View
@@ -189,10 +237,11 @@ const AddLocation = props => {
             {/* Google Location */}
             <Text style={[styles.label, {marginTop: 20}]}>Location *</Text>
             <TextInput
-              style={styles.cardInput}
-              placeholder="Search for a location"
+              style={[styles.cardInput, {backgroundColor: '#eee'}]}
+              placeholder="Select Location from Maps"
               placeholderTextColor="#aaa"
               value={googleLocation}
+              editable={false}
               onChangeText={text => {
                 setGoogleLocation(text);
                 setErrors(prev => ({...prev, googleLocation: undefined}));
@@ -236,7 +285,57 @@ const AddLocation = props => {
             {errors.radius && (
               <Text style={styles.errorText}>{errors.radius}</Text>
             )}
+            <View style={styles.container}>
+              {/* Search Bar */}
+              <GooglePlacesAutocomplete
+                placeholder="Search for a location"
+                fetchDetails={true}
+                onPress={(data, details = null) => {
+                  const location = details.geometry.location;
+                  const newRegion = {
+                    latitude: location.lat,
+                    longitude: location.lng,
+                    latitudeDelta: 0.015,
+                    longitudeDelta: 0.0121,
+                  };
+                  setRegion(newRegion);
+                  mapRef.current.animateToRegion(newRegion, 1000);
+                }}
+                query={{
+                  key: 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA',
+                  language: 'en',
+                }}
+                styles={{
+                  container: {
+                    position: 'absolute',
+                    top: 10,
+                    width: '100%',
+                    zIndex: 1,
+                  },
+                  listView: {
+                    backgroundColor: 'red',
+                    color: 'black',
+                  },
+                }}
+              />
 
+              {/* Map View */}
+              <View style={styles.mapsContainer}>
+                <MapView
+                  provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+                  style={styles.map}
+                  region={{
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.015,
+                    longitudeDelta: 0.0121,
+                  }}
+                  onPress={handleMapPress} // Handle tap
+                >
+                  {markerCoordinate && <Marker coordinate={markerCoordinate} />}
+                </MapView>
+              </View>
+            </View>
             {/* Submit Button */}
             <View style={styles.bottomButtonContainer}>
               <Animated.View
@@ -272,7 +371,10 @@ const mapStateToProps = state => ({
   AUTH_DATA: state.authData.authDataList,
 });
 
-export default connect(mapStateToProps, {getLocationByUserData})(AddLocation);
+export default connect(mapStateToProps, {
+  getLocationByUserData,
+  getTrackingByUserData,
+})(AddLocation);
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -326,11 +428,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomButton: {
-    backgroundColor: '#5409DA',
+    backgroundColor: '#000',
     paddingVertical: 16,
     paddingHorizontal: 80,
     borderRadius: 50,
-    shadowColor: '#5409DA',
+    shadowColor: '#000',
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -344,5 +446,17 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: '#aaa',
+  },
+  mapsContainer: {
+    // ...StyleSheet.absoluteFillObject,
+    marginTop: 10,
+    padding: 10,
+    height: 300,
+    // width: 300,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
 });

@@ -352,11 +352,11 @@ const styles = StyleSheet.create({
   },
 
   bottomButton: {
-    backgroundColor: '#5409DA', // vibrant coral-like color
+    backgroundColor: '#000', // vibrant coral-like color
     paddingVertical: 16,
     paddingHorizontal: 80,
     borderRadius: 50,
-    shadowColor: '#5409DA',
+    shadowColor: '#000',
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.3,
     shadowRadius: 8,

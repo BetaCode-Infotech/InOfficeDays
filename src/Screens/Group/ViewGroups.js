@@ -1,9 +1,12 @@
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../../../components/Header/Header';
 import {CategoryList} from '../../../constants/Fns';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import {connect} from 'react-redux';
+import Icons from '../../../constants/Icons';
+import {ADD_GROUP} from '../../utils/Routes/Routes';
+import {useNavigation} from '@react-navigation/native';
 
 const ViewGroups = props => {
   const [allGroupsList, setAllGroupsList] = useState([]);
@@ -38,9 +41,51 @@ const ViewGroups = props => {
     );
   };
 
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <Header title="View Groups" showBack />
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          paddingHorizontal: 10,
+          paddingTop: 10,
+        }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ADD_GROUP)}
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#000',
+            alignItems: 'center',
+            width: 150,
+            borderRadius: 10,
+            padding: 10,
+          }}>
+          <Text
+            style={{
+              color: '#fff',
+            }}>
+            Add Group{' '}
+          </Text>
+          <ImageIcon
+            icon={Icons.group}
+            iconStyle={{
+              width: 30,
+              height: 30,
+              tintColor: '#fff',
+            }}
+            containerStyle={{
+              borderRadius: 50,
+              marginHorizontal: 10,
+            }}
+            onPress={() => {
+              // navigation.navigate(PROFILE);
+            }}
+          />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={allGroupsList}
         keyExtractor={item => item.KEY}

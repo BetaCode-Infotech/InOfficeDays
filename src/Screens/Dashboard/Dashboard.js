@@ -11,12 +11,11 @@ import {
   FlatList,
   Animated,
   Easing,
+  Pressable,
+  RefreshControl,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-// import styles from './ProfileStyles';
 import profile from '../../../assets/icons/profile.png';
-import location from '../../../assets/icons/gps.png';
-import people from '../../../assets/icons/people.png';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Progress from 'react-native-progress';
 import {
@@ -24,6 +23,7 @@ import {
   ADD_LOCATION,
   GROUP,
   PROFILE,
+  TRACKING_HISTORY,
 } from '../../utils/Routes/Routes';
 import IconButton from '../../../components/IconButton/IconButton';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
@@ -31,57 +31,52 @@ import {CategoryList} from '../../../constants/Fns';
 import Icons from '../../../constants/Icons';
 import {PieChart} from 'react-native-gifted-charts';
 import {connect} from 'react-redux';
+import AnimatedCard from '../../../components/AnimatedCard/AnimatedCard';
+import {getTrackingByUserData} from '../../Redux/Action/getAllGroupData';
 const {width} = Dimensions.get('window');
 const CARD_WIDTH = Math.min(width * 0.9);
 
 function Dashboard(props) {
   const [newUser, setNewUser] = useState(true);
   const navigation = useNavigation();
+  const [milestonesData, setMilestonesData] = useState([]);
 
-  const data = [
-    {value: 60, color: '#FF8C00'}, // 60%
-    {value: 40, color: '#E0E0E0'}, // 40%
-  ];
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [milestonesData, setMilestonesData] = useState([
-    {
-      id: '1',
-      GROUP_NAME: 'Greyt HR Office',
-      LOCATION_NAME: 'Greyt HR Office',
-      CATEGORY: '1',
-      DUE_DATE: '',
-      icon: people,
-      pinned: true,
-      gradient: ['#21a3f1', '#0668a3'],
-    },
-    {
-      id: '2',
-      GROUP_NAME: 'Greyt HR Office',
-      locations: 5,
-      CATEGORY: '2',
-      pinned: false,
-      icon: location,
-      gradient: ['#5409DA', '#4E71FF'],
-    },
-  ]);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await props.getTrackingByUserData(props.AUTH_DATA?._id);
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     if (props.GROUP_DATA.length > 0 && props.LOCATION_DATA.length > 0) {
       setNewUser(false);
+    } else {
+      setNewUser(true);
     }
   }, [props.GROUP_DATA, props.LOCATION_DATA]);
+
+  useEffect(() => {
+    let tempTrackingData = [...props.TRACKING_DATA];
+    if (tempTrackingData.length > 0) {
+      tempTrackingData.sort((a, b) => {
+        if (a.PINNED === b.PINNED) return 0;
+        return a.PINNED ? -1 : 1;
+      });
+      setMilestonesData(tempTrackingData);
+    }
+  }, [props.TRACKING_DATA]);
   const handlePin = selectedId => {
     const updatedData = milestonesData.map(item => ({
       ...item,
-      pinned: item.id === selectedId,
+      PINNED: item.id === selectedId,
     }));
     setMilestonesData(updatedData);
   };
-  // Animated value for rotation
   const spinAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Animate from 0 to 0.5 (0 to 180deg)
     Animated.timing(spinAnim, {
       toValue: 0.5,
       duration: 2000, // 2 seconds
@@ -90,102 +85,125 @@ function Dashboard(props) {
     }).start();
   }, [spinAnim]);
 
-  // Interpolate spin value to rotation degrees
-  const spinInterpolate = spinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
   const renderGroupCard = ({item, index}) => {
-    const categoryData = CategoryList.find(cat => cat.value == item.CATEGORY);
+    const spinInterpolate = spinAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '360deg'],
+    });
+    const categoryData = CategoryList.find(
+      cat => cat.value == item.CATEGORY_ID,
+    );
 
+    const percentage = Math.min(
+      (item.ACHIEVEMENT / item.MILESTONE_DAYS) * 100,
+      100,
+    ).toFixed(0);
+
+    const outerRadius = 100;
+    const donutThickness = 20 + (100 - percentage) * 0.3; // You can tweak this formula
+    const innerRadius = outerRadius - donutThickness;
+    const data = [
+      {value: item.ACHIEVEMENT, color: '#FF8C00'}, // orange part
+      {value: item.MILESTONE_DAYS - item.ACHIEVEMENT, color: '#E0E0E0'}, // remaining part
+    ];
     return (
-      <TouchableWithoutFeedback
-        // style={{}}
-        onPress={() => navigation.navigate(GROUP, {groupId: item.id})}>
-        <LinearGradient
-          colors={item.gradient}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
-          style={styles.cardNotPinned}>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>{item.GROUP_NAME}</Text>
-            <IconButton
-              icon={item.pinned ? Icons.pinFilled : Icons.pinBorder}
-              iconStyle={{
-                tintColor: '#fff',
-                width: 20,
-                height: 20,
-              }}
-              onPress={() => handlePin(item.id)}
-            />
-          </View>
-
-          <View style={[styles.statusBadge, {marginBottom: 20}]}>
-            <Text style={styles.badgeText}>20/10/2025 -27/10/2025</Text>
-          </View>
-
-          {item.pinned == true && (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                // height: 150,
-              }}>
-              <Animated.View
-                style={{
-                  transform: [{rotate: spinInterpolate}, {rotate: '-90deg'}],
-                }}>
-                <PieChart
-                  data={data}
-                  donut
-                  radius={100}
-                  innerRadius={60}
-                  showText
-                  textColor="black"
-                  textSize={16}
-                  strokeCap="butt"
-                />
-              </Animated.View>
-              <View style={{position: 'absolute', top: 80}}>
-                <Text style={{fontSize: 18, fontWeight: 'bold'}}>60%</Text>
-              </View>
-            </View>
-          )}
-          {item.pinned == false && (
-            <View style={{width: '100%'}}>
-              <Progress.Bar
-                progress={0.6} // 60%
-                width={null}
-                height={6}
-                color="#fff"
-                unfilledColor="rgba(255,255,255,0.3)"
-                borderWidth={0}
-                borderRadius={3}
+      <AnimatedCard
+        onPress={() =>
+          navigation.navigate(TRACKING_HISTORY, {
+            TRACKING_ID: item._id,
+            GROUP_ID: item.GROUP_ID,
+          })
+        }>
+        <View>
+          <LinearGradient
+            colors={item.GRADIENT_COLOR}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            style={styles.cardNotPinned}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>{item.GROUP_NAME}</Text>
+              <IconButton
+                icon={item.PINNED ? Icons.pinFilled : Icons.pinBorder}
+                iconStyle={{
+                  tintColor: '#fff',
+                  width: 20,
+                  height: 20,
+                }}
+                onPress={() => handlePin(item.id)}
               />
+            </View>
+
+            <View style={[styles.statusBadge, {marginBottom: 20}]}>
+              <Text style={styles.badgeText}>
+                {new Date(item.START_DATE).toDateString()} -{' '}
+                {new Date(item.END_DATE).toDateString()}
+              </Text>
+            </View>
+
+            {item.PINNED == true && (
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginTop: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  // height: 150,
                 }}>
-                <Text style={styles.progressLabel}>0%</Text>
-                <Text style={styles.progressLabel}>60%</Text>
-                {/* <Text style={styles.progressLabel}>
-                  {Math.round(progress * 100)}%
-                </Text> */}
-                <Text style={styles.progressLabel}>100%</Text>
+                <Animated.View
+                  style={{
+                    transform: [{rotate: spinInterpolate}, {rotate: '-90deg'}],
+                  }}>
+                  <PieChart
+                    data={data}
+                    donut
+                    radius={outerRadius}
+                    innerRadius={innerRadius}
+                    showText
+                    textColor="black"
+                    textSize={16}
+                    strokeCap="butt"
+                  />
+                </Animated.View>
+                <View style={{position: 'absolute', top: 80}}>
+                  <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+                    {percentage}%
+                  </Text>
+                </View>
               </View>
+            )}
+            {item.PINNED == false && (
+              <View style={{width: '100%'}}>
+                <Progress.Bar
+                  progress={percentage / 100} // 60%
+                  width={null}
+                  height={6}
+                  color="#fff"
+                  unfilledColor="rgba(255,255,255,0.3)"
+                  borderWidth={0}
+                  borderRadius={3}
+                />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: 4,
+                  }}>
+                  <Text style={styles.progressLabel}>0%</Text>
+                  {percentage != 0 && (
+                    <Text style={styles.progressLabel}>{percentage}%</Text>
+                  )}
+                  <Text style={styles.progressLabel}>100%</Text>
+                </View>
+              </View>
+            )}
+            <View style={[styles.titleRow, {marginTop: 10}]}>
+              {categoryData?.icon && <ImageIcon icon={categoryData.icon} />}
+              <Text style={styles.badgeText}>
+                {percentage == 100 ? 'Completed' : 'In Progress'}
+              </Text>
             </View>
-          )}
-
-          <View style={[styles.titleRow, {marginTop: 10}]}>
-            {categoryData.icon && <ImageIcon icon={categoryData.icon} />}
-            <Text style={styles.badgeText}>Completed</Text>
-          </View>
-        </LinearGradient>
-      </TouchableWithoutFeedback>
+          </LinearGradient>
+        </View>
+      </AnimatedCard>
     );
   };
 
@@ -265,12 +283,14 @@ function Dashboard(props) {
           {newUser === false && (
             <FlatList
               data={milestonesData}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item._id}
               contentContainerStyle={{
-                // paddingVertical: 20,
                 alignItems: 'center',
               }}
               renderItem={renderGroupCard}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
             />
           )}
         </>
@@ -283,14 +303,16 @@ function Dashboard(props) {
     </View>
   );
 }
-
 const mapStateToProps = state => ({
   AUTH_DATA: state.authData.authDataList,
   GROUP_DATA: state.groupData.groupList,
   LOCATION_DATA: state.locationData.locationList,
+  TRACKING_DATA: state.trackingData.trackingList,
 });
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps, {
+  getTrackingByUserData,
+})(Dashboard);
 
 const styles = StyleSheet.create({
   container: {
