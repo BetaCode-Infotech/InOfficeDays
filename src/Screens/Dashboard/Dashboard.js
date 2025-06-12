@@ -13,6 +13,7 @@ import {
   Easing,
   Pressable,
   RefreshControl,
+  Vibration,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import profile from '../../../assets/icons/profile.png';
@@ -25,6 +26,8 @@ import {
   PROFILE,
   TRACKING_HISTORY,
 } from '../../utils/Routes/Routes';
+import Toast from 'react-native-toast-message';
+import {toastConfig} from '../../../constants/Fns';
 import IconButton from '../../../components/IconButton/IconButton';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import {CategoryList} from '../../../constants/Fns';
@@ -33,9 +36,13 @@ import {PieChart} from 'react-native-gifted-charts';
 import {connect} from 'react-redux';
 import AnimatedCard from '../../../components/AnimatedCard/AnimatedCard';
 import {getTrackingByUserData} from '../../Redux/Action/getAllGroupData';
+import Axios from '../../utils/Axios';
+import axios from 'axios';
+
 const {width} = Dimensions.get('window');
 const CARD_WIDTH = Math.min(width * 0.9);
-
+const DURATION = 100;
+const PATTERN = [2 * DURATION, 1 * DURATION];
 function Dashboard(props) {
   const [newUser, setNewUser] = useState(true);
   const navigation = useNavigation();
@@ -67,12 +74,29 @@ function Dashboard(props) {
       setMilestonesData(tempTrackingData);
     }
   }, [props.TRACKING_DATA]);
-  const handlePin = selectedId => {
-    const updatedData = milestonesData.map(item => ({
-      ...item,
-      PINNED: item.id === selectedId,
-    }));
-    setMilestonesData(updatedData);
+  const handlePin = async selectedId => {
+    // const updatedData = milestonesData.map(item => ({
+    //   ...item,
+    //   PINNED: item.id === selectedId,
+    // }));
+    await axios
+      .post(Axios.axiosUrl + Axios.pinTracking, {
+        TRACKING_ID: selectedId,
+      })
+      .then(async response => {
+        await props.getTrackingByUserData(props.AUTH_DATA?._id);
+
+        console.log('Logout ', response.data);
+      })
+      .catch(err => {
+        console.log('err', err);
+        Toast.show({
+                  type: 'error',
+                  text1: `Something went wrong`,
+                });
+                Vibration.vibrate(PATTERN);
+      });
+    // setMilestonesData(updatedData);
   };
   const spinAnim = useRef(new Animated.Value(0)).current;
 
@@ -129,7 +153,7 @@ function Dashboard(props) {
                   width: 20,
                   height: 20,
                 }}
-                onPress={() => handlePin(item.id)}
+                onPress={() => handlePin(item._id)}
               />
             </View>
 
@@ -209,6 +233,17 @@ function Dashboard(props) {
 
   return (
     <View style={styles.container}>
+       <View
+              style={[
+                {
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  zIndex: 1000,
+                },
+              ]}>
+              <Toast position="top" topOffset={0} config={toastConfig} />
+            </View>
       <View style={{backgroundColor: '#fff'}}>
         <IconButton
           icon={profile}
