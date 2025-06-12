@@ -192,7 +192,7 @@ const ViewLocations = props => {
         <View style={styles.cardContent}>
           <View>
             <Text style={styles.title}>{item.LOCATION_NAME}</Text>
-            <Text style={styles.location}>Location: {item.LOCATION}</Text>
+            {/* <Text style={styles.location}>Location: {item.LOCATION}</Text> */}
             <Text>Radius: {item.RADIUS}</Text>
           </View>
 
