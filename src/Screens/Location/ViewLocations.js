@@ -80,11 +80,11 @@ const ViewLocations = props => {
       cat => cat.value == item.CATEGORY_ID,
     );
     return (
-      <View key={item.KEY} style={styles.card}>
+      <View key={`location-${item._id}`} style={styles.card}>
         <View style={styles.cardContent}>
           <View>
             <Text style={styles.title}>{item.LOCATION_NAME}</Text>
-            <Text>Location: {item.LOCATION}</Text>
+            {/* <Text>Location: {item.LOCATION}</Text> */}
             <Text>Radius: {item.RADIUS} km</Text>
           </View>
           <View style={styles.iconContainer}>
@@ -146,7 +146,7 @@ const ViewLocations = props => {
       </View>
       <FlatList
         data={groupedLocations}
-        keyExtractor={item => item._id}
+        keyExtractor={item => `group-${item._id}`}
         renderItem={({item}) => (
           <View style={styles.accordionSection}>
             <TouchableOpacity

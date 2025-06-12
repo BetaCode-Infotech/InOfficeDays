@@ -89,13 +89,6 @@ function AddGroup(props) {
 
     setErrors(newErrors);
 
-    console.log('aksdlksadasd', {
-      GROUP_NAME: groupName,
-      CATEGORY_ID: category,
-      MILESTONE_FREQUENCY_ID: frequency,
-      MILESTONE_DAYS: Number(milestoneDays),
-      USER_ID: props.AUTH_DATA._id,
-    });
     if (Object.keys(newErrors).length > 0) return;
     setLoading(true);
     // Dummy API call

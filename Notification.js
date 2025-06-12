@@ -7,13 +7,14 @@ import {
   Vibration,
   View,
 } from 'react-native';
-// import PushNotification from 'react-native-push-notification';
+import PushNotification from 'react-native-push-notification';
 
 export default function Notification() {
   useEffect(() => {
     createChannels();
     requestPermissions();
   }, []);
+  
 
   const requestPermissions = () => {
     const grant = PermissionsAndroid.request(
@@ -43,7 +44,7 @@ export default function Notification() {
       vibrate: true,
       vibration: [0, 200, 100, 300], // Standardized pattern
     });
-  Vibration.vibrate([0, 200, 100, 300]); 
+    Vibration.vibrate([0, 200, 100, 300]);
   };
 
   const handleNotificationB = () => {

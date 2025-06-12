@@ -1,4 +1,3 @@
-import {Icon} from 'react-native-paper';
 import Icons from './Icons';
 
 export const toastConfig = {
@@ -62,6 +61,7 @@ export const toastConfig = {
 export function toBoolean(value) {
   return value === 1 ? true : value === 0 ? false : value;
 }
+import {PermissionsAndroid, Platform, Alert} from 'react-native';
 
 export const CategoryList = [
   {

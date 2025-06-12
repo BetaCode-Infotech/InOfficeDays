@@ -36,8 +36,6 @@ const Profile = props => {
     });
   }, [props.AUTH_DATA]);
 
-  console.log('asdnasdas', userDetails);
-
   const formatJoinDate = dateString => {
     if (!dateString) return '';
 

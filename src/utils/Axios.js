@@ -11,6 +11,7 @@ const getGroupByUser = 'inOffice/group/getGroupByUser';
 const getLocationByUser = 'inOffice/location/getLocationByUser';
 const getTrackingByUser = 'inOffice/tracking/getTrackingByUser';
 const getTrackingHistory = 'inOffice/tracking/getTrackingHistory';
+const incrementAchievement = 'inOffice/tracking/incrementAchievement';
 const userLogout = 'user/userLogout';
 export default {
   axiosUrl,
@@ -27,4 +28,5 @@ export default {
   getLocationByUser,
   getTrackingByUser,
   getTrackingHistory,
+  incrementAchievement,
 };

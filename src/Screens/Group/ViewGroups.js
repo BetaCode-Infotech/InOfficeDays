@@ -88,7 +88,7 @@ const ViewGroups = props => {
       </View>
       <FlatList
         data={allGroupsList}
-        keyExtractor={item => item.KEY}
+        keyExtractor={item => item._id}
         renderItem={renderGroupCard}
         style={styles.viewGroups}
         contentContainerStyle={styles.list}

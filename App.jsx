@@ -20,7 +20,7 @@ const App = () => {
             <StatusBar
               animated={true}
               backgroundColor={'#fff'}
-              barStyle={'light-content'}
+              barStyle={'dark-content'}
             />
             <MainLayout />
             {/* <RenderDataOnLoad /> */}

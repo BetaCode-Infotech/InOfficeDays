@@ -2,11 +2,17 @@
 
 import BackgroundFetch from 'react-native-background-fetch';
 import PushNotification from 'react-native-push-notification';
-import {Vibration} from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
+import {PermissionsAndroid, Platform, Vibration} from 'react-native';
+import {useSelector} from 'react-redux';
+import {store} from './src/Redux/Store';
+import axios from 'axios';
+import Axios from './src/utils/Axios';
 
 export const backgroundTask = async () => {
   // First, create notification channel
   createChannels();
+  handleNotification('asbcd');
 
   let status = await BackgroundFetch.configure(
     {
@@ -18,7 +24,6 @@ export const backgroundTask = async () => {
     },
     async taskId => {
       console.log('[BackgroundFetch] Received taskId: ', taskId);
-
       // Send a notification when any task is received
       handleNotification(`Task received: ${taskId}`);
 
@@ -50,7 +55,112 @@ const createChannels = () => {
   );
 };
 
-const handleNotification = message => {
+const requestLocationPermission = async () => {
+  if (Platform.OS === 'android') {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  }
+  return true;
+};
+const getCurrentLatLong = () => {
+  return new Promise((resolve, reject) => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        console.log('Latitude:', latitude);
+        console.log('Longitude:', longitude);
+        resolve({latitude, longitude});
+      },
+      error => {
+        console.error('Location error:', error);
+        reject(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      },
+    );
+  });
+};
+
+const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
+  const R = 6371000; // Radius of the Earth in meters
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+};
+
+/**
+ * Filters locations where current position is inside the radius
+ */
+const findMatchingLocations = (currentLocation, locationData) => {
+  const {latitude, longitude} = currentLocation;
+
+  return locationData.filter(loc => {
+    const targetLat = loc.LOCATION.latitude;
+    const targetLng = loc.LOCATION.longitude;
+    const radiusInMeters = parseFloat(loc.RADIUS); // assumed in meters
+
+    const distance = getDistanceFromLatLonInMeters(
+      latitude,
+      longitude,
+      targetLat,
+      targetLng,
+    );
+
+    return distance <= radiusInMeters;
+  });
+};
+
+const handleNotification = async message => {
+  // const groupData = useSelector(state => state.groupData);
+  const state = store.getState();
+  const locationData = state.locationData.locationList;
+
+  const hasPermission = await requestLocationPermission();
+  if (!hasPermission) {
+    console.log('Location permission denied');
+    return;
+  }
+
+  const data = await getCurrentLatLong();
+
+  const matches = findMatchingLocations(data, locationData);
+
+  let payload = [];
+  if (matches && matches.length > 0) {
+    matches.map(val => {
+      payload.push({
+        GROUP_ID: val.GROUP_ID,
+        LOCATION_ID: val._id,
+      });
+    });
+    await axios
+      .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
+      .then(response => {
+        console.log('asdasdasdas', response.data);
+      })
+      .catch(err => {
+        console.log('asdasdasdas', err);
+      });
+  }
+
+  console.log('Matching Locations:', matches);
+
+  console.log('locationData', locationData, data);
+
   PushNotification.localNotification({
     channelId: 'test-channel',
     title: 'Background Task Triggered!',
@@ -64,6 +174,7 @@ const handleNotification = message => {
 
   Vibration.vibrate([0, 200, 100, 300]);
 };
+
 export const backgroundHeadlessTask = async event => {
   console.log('[BackgroundFetch HeadlessTask] start: ', event.taskId);
 
