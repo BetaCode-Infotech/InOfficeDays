@@ -32,7 +32,6 @@ import {
   getTrackingByUserData,
 } from '../../Redux/Action/getAllGroupData';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
-import Config from 'react-native-config';
 
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
