@@ -184,6 +184,7 @@ const ViewLocations = props => {
             setCurrentPopoverData(item);
             setUpdatedData(item);
             setLocationName(item.LOCATION_NAME);
+            setGoogleLocation(item.LOCATION);
           }}>
           <Image
             source={Icons.optionsDotsMore}
@@ -195,7 +196,7 @@ const ViewLocations = props => {
           <View>
             <Text style={styles.location}>{item.LOCATION_NAME}</Text>
             {/* <Text style={styles.location}>Location: {item.LOCATION}</Text> */}
-            <Text>Radius: {item.RADIUS}</Text>
+            <Text>Radius: {item.RADIUS} M</Text>
           </View>
 
           <View style={styles.iconContainer}>
@@ -531,24 +532,33 @@ const ViewLocations = props => {
                 style={styles.cardInput}
                 placeholder="Select Radius"
                 data={radiusOptions}
+                iconStyle={styles.iconStyle}
                 labelField="label"
                 valueField="value"
-                value={updatedData.RADIUS}
+                value={Number(updatedData?.RADIUS)}
                 onChange={item => {
                   setGroup(item.value);
                   setUpdatedData(prev => ({
                     ...prev,
-                    RADIUS: item,
+                    RADIUS: item.value,
                   }));
                 }}
                 renderItem={item => (
                   <View style={styles.dropdownItem}>
+                    <Image source={item.icon} style={styles.itemIcon} />
+
                     <Text style={styles.dropdownItemText}>{item.label}</Text>
+                  </View>
+                )}
+                renderSelectedItem={(item, index) => (
+                  <View style={styles.selectedItemContainer}>
+                    <Image source={item.icon} style={styles.itemIcon} />
+                    <Text style={styles.itemText}>{item.label}</Text>
                   </View>
                 )}
               />
 
-              <Text>{(updatedData.RADIUS)}</Text>
+              <Text>{updatedData.RADIUS}</Text>
 
               <View style={{height: 300, marginTop: 20}}>
                 <MapView
@@ -758,6 +768,8 @@ const styles = StyleSheet.create({
   dropdownItem: {
     paddingVertical: 8, // adjust this number to control vertical spacing
     paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
 
   dropdownItemText: {
@@ -782,6 +794,12 @@ const styles = StyleSheet.create({
   },
   locationButtonText: {
     fontSize: 20,
+  },
+  itemIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    resizeMode: 'contain',
   },
 });
 
