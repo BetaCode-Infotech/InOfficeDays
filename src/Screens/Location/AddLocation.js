@@ -27,7 +27,7 @@ import Header from '../../../components/Header/Header';
 import {Dropdown} from 'react-native-element-dropdown';
 import {connect} from 'react-redux';
 import Toast from 'react-native-toast-message';
-import {toastConfig, toBoolean} from '../../../constants/Fns';
+import {radiusOptions, toastConfig, toBoolean} from '../../../constants/Fns';
 import {
   getLocationByUserData,
   getTrackingByUserData,
@@ -36,17 +36,9 @@ import MapView, {Circle, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation'; // Install this if not already
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA';
-
+// import {GOOGLE_MAPS_API_KEY} from '@env';
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
-
-const radiusOptions = [
-  {label: '50 M', value: 50, icon: locationIcon},
-  {label: '100 M', value: 100, icon: locationIcon},
-  {label: '200 M', value: 200, icon: locationIcon},
-  {label: '500 M', value: 500, icon: locationIcon},
-  {label: '1000 M', value: 1000, icon: locationIcon},
-];
 
 const AddLocation = props => {
   const navigation = useNavigation();
@@ -310,7 +302,7 @@ const AddLocation = props => {
               renderItem={item => (
                 <View style={styles.itemContainer}>
                   <Image source={item.icon} style={styles.itemIcon} />
-                  <Text style={styles.itemText}>{item.label}</Text>
+                  <Text style={styles.itemText}>{item.value}</Text>
                 </View>
               )}
               renderSelectedItem={(item, index) => (
