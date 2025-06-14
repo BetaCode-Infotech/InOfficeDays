@@ -1,4 +1,5 @@
 import Icons from './Icons';
+import locationIcon from '../assets/icons/location.png';
 
 export const toastConfig = {
   tomatoToast: ({text1, props}) => (
@@ -79,4 +80,12 @@ export const CategoryList = [
     value: 3,
     icon: Icons.hearts,
   },
+];
+
+export const radiusOptions = [
+  {label: '50 M', value: 50, icon: locationIcon},
+  {label: '100 M', value: 100, icon: locationIcon},
+  {label: '200 M', value: 200, icon: locationIcon},
+  {label: '500 M', value: 500, icon: locationIcon},
+  {label: '1000 M', value: 1000, icon: locationIcon},
 ];
