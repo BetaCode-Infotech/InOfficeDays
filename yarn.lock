@@ -3592,6 +3592,11 @@ event-target-shim@^5.0.0, event-target-shim@^5.0.1:
   resolved "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
+eventemitter3@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
+  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
+
 execa@^5.0.0:
   version "5.1.1"
   resolved "https://registry.npmjs.org/execa/-/execa-5.1.1.tgz"
@@ -5958,6 +5963,13 @@ react-native-animated-loader@^1.0.0:
   dependencies:
     prop-types "^15.6.2"
 
+react-native-background-actions@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/react-native-background-actions/-/react-native-background-actions-4.0.1.tgz"
+  integrity sha512-LADhnb4ag1oH5Lotq0j8K9e2cFmrafFyg2PCME88VkTjqDUgNcJonkNdMCTHN0N3fh+hwAA7nDR4Cxkj9Q8eCw==
+  dependencies:
+    eventemitter3 "^4.0.7"
+
 react-native-background-fetch@^4.2.8:
   version "4.2.8"
   resolved "https://registry.npmjs.org/react-native-background-fetch/-/react-native-background-fetch-4.2.8.tgz"
@@ -5981,6 +5993,11 @@ react-native-element-dropdown@^2.12.4:
   integrity sha512-abZc5SVji9FIt7fjojRYrbuvp03CoeZJrgvezQoDoSOrpiTqkX69ix5m+j06W2AVncA0VWvbT+vCMam8SoVadw==
   dependencies:
     lodash "^4.17.21"
+
+react-native-foreground-service@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/react-native-foreground-service/-/react-native-foreground-service-1.0.0.tgz"
+  integrity sha512-lZTF0gFKVh4pnI8C0vXKxTBeZxlbfYCy4wPl5O7mkbBLr8F1vZJvmZYMhh4+P5oM285z/CaWB00ckMTZPG7G9w==
 
 react-native-gifted-charts@^1.4.61:
   version "1.4.61"
@@ -6089,7 +6106,7 @@ react-native-toast-message@^2.3.0:
   resolved "https://registry.npmjs.org/react-native-toast-message/-/react-native-toast-message-2.3.0.tgz"
   integrity sha512-d7LldTK1ei1Bl7RFhoOYw8hVQ4oKPQHORYI//xR9Pyz3HxSlFlvQbueE5X3KLoemRRgBrOUg3zY6DxXnxrVLRg==
 
-react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", "react-native@>= 0.46", "react-native@>= 0.61.5", "react-native@>= 0.76.0", react-native@>=0.33, react-native@>=0.46, react-native@>=0.57.0, react-native@>=0.58.4, react-native@>=0.71.0, react-native@0.78.1:
+react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", "react-native@>= 0.46", "react-native@>= 0.61.5", "react-native@>= 0.76.0", react-native@>=0.33, react-native@>=0.46, react-native@>=0.47.0, react-native@>=0.57.0, react-native@>=0.58.4, react-native@>=0.59.0, react-native@>=0.71.0, react-native@0.78.1:
   version "0.78.1"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.78.1.tgz"
   integrity sha512-3CK/xxX02GeeVFyrXbsHvREZFVaXwHW43Km/EdYITn5G32cccWTGaqY9QdPddEBLw5O3BPip3LHbR1SywE0cpA==

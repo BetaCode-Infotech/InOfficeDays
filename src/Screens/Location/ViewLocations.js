@@ -38,11 +38,11 @@ import Geolocation from '@react-native-community/geolocation'; // Install this i
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA';
 // import {GOOGLE_MAPS_API_KEY} from '@env';
 
-// Group items by GROUP_ID
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
 const screenHeight = Dimensions.get('window').height;
 
+// Group items by GROUP_ID
 const groupByGroupId = data => {
   const grouped = {};
   data.forEach(item => {
@@ -425,7 +425,7 @@ const ViewLocations = props => {
       </View>
       <FlatList
         data={groupedLocations}
-        keyExtractor={item => `group-${item._id}`}
+        keyExtractor={item => `group-${item.GROUP_ID}`}
         renderItem={({item}) => (
           <View style={styles.accordionSection}>
             <TouchableOpacity

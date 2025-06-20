@@ -5,6 +5,7 @@ const userUpdate = 'inOffice/user/userUpdate';
 const getSessionById = 'sessions/getSessionById';
 const createGroups = 'inOffice/group/createGroup';
 const updateGroup = 'inOffice/group/updateGroup';
+const deleteGroup = 'inOffice/group/deleteGroup';
 const createLocation = 'inOffice/location/createLocation';
 const updateLocation = 'inOffice/location/updateLocation';
 const getGroupByUser = 'inOffice/group/getGroupByUser';
@@ -29,4 +30,5 @@ export default {
   getTrackingByUser,
   getTrackingHistory,
   pinTracking,
+  deleteGroup,
 };

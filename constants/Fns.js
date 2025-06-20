@@ -89,3 +89,8 @@ export const radiusOptions = [
   {label: '500 M', value: 500, icon: locationIcon},
   {label: '1000 M', value: 1000, icon: locationIcon},
 ];
+export const frequencyOptions = [
+  {label: 'Weekly', value: 'weekly', icon: Icons.email},
+  {label: 'Monthly', value: 'monthly', icon: Icons.email},
+  {label: 'Quarterly', value: 'quarterly', icon: Icons.email},
+];
