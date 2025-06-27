@@ -22,7 +22,12 @@ import Header from '../../../components/Header/Header';
 import Axios from '../../utils/Axios';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
-import {CategoryList, toastConfig, toBoolean} from '../../../constants/Fns';
+import {
+  CategoryList,
+  toastConfig,
+  toBoolean,
+  frequencyOptions,
+} from '../../../constants/Fns';
 import {connect} from 'react-redux';
 import {getGroupByUserData} from '../../Redux/Action/getAllGroupData';
 
@@ -35,11 +40,7 @@ const categoryOptions = [
   {label: 'Finance', value: 'finance', icon: Icons.email},
 ];
 
-const frequencyOptions = [
-  {label: 'Weekly', value: 'weekly', icon: Icons.email},
-  {label: 'Monthly', value: 'monthly', icon: Icons.email},
-  {label: 'Quarterly', value: 'quarterly', icon: Icons.email},
-];
+
 
 function AddGroup(props) {
   const navigation = useNavigation();
@@ -122,7 +123,7 @@ function AddGroup(props) {
       });
     // Optionally reset form or show success UI
   };
-
+  
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View
