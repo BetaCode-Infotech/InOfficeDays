@@ -9,15 +9,12 @@ import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
 
-
 export const backgroundTask = async () => {
-  // First, create notification channel
   createChannels();
-  handleNotification('asbcd');
 
   let status = await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 1, // Fetch interval in minutes
+      minimumFetchInterval: 15, // 15 min is Android's actual reliable min interval
       stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
@@ -25,9 +22,7 @@ export const backgroundTask = async () => {
     },
     async taskId => {
       console.log('[BackgroundFetch] Received taskId: ', taskId);
-      // Send a notification when any task is received
-      handleNotification(`Task received: ${taskId}`);
-
+      await handleNotification(`Task received: ${taskId}`);
       BackgroundFetch.finish(taskId);
     },
     async taskId => {
@@ -36,13 +31,13 @@ export const backgroundTask = async () => {
     },
   );
 
-  // Optional: Schedule a custom task
   BackgroundFetch.scheduleTask({
     taskId: 'com.foo.customtask',
     forceAlarmManager: true,
-    delay: 500, // milliseconds
+    delay: 1000,
   });
 };
+
 
 const createChannels = () => {
   PushNotification.createChannel(
