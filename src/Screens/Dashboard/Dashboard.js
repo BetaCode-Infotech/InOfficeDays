@@ -91,10 +91,10 @@ function Dashboard(props) {
       .catch(err => {
         console.log('err', err);
         Toast.show({
-                  type: 'error',
-                  text1: `Something went wrong`,
-                });
-                Vibration.vibrate(PATTERN);
+          type: 'error',
+          text1: `Something went wrong`,
+        });
+        Vibration.vibrate(PATTERN);
       });
     // setMilestonesData(updatedData);
   };
@@ -233,18 +233,18 @@ function Dashboard(props) {
 
   return (
     <View style={styles.container}>
-       <View
-              style={[
-                {
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  zIndex: 1000,
-                },
-              ]}>
-              <Toast position="top" topOffset={0} config={toastConfig} />
-            </View>
-      <View style={{backgroundColor: '#fff'}}>
+      <View
+        style={[
+          {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          },
+        ]}>
+        <Toast position="top" topOffset={0} config={toastConfig} />
+      </View>
+      <View style={{backgroundColor: '#fff', paddingTop: 10}}>
         <IconButton
           icon={profile}
           iconStyle={{
