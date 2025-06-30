@@ -4,13 +4,18 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.location.LocationManager
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.inofficedays.R
+import com.facebook.react.ReactApplication
+import com.facebook.react.ReactInstanceManager
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.google.android.gms.location.*
+import com.inofficedays.modules.LocationServiceModule
 
 class LocationForegroundService : Service() {
 
@@ -27,7 +32,7 @@ class LocationForegroundService : Service() {
 
     private fun startLocationUpdates() {
         val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 60000
+            Priority.PRIORITY_HIGH_ACCURACY, 60000 // 1 minute interval
         ).setMinUpdateDistanceMeters(0f)
             .build()
 
@@ -42,7 +47,8 @@ class LocationForegroundService : Service() {
             location?.let {
                 Log.d("LocationService", "Lat: ${it.latitude}, Lng: ${it.longitude}")
 
-                // Optional: update notification
+                sendLocationToJS(it.latitude, it.longitude)
+
                 val notification = createNotification(
                     "Lat: ${it.latitude}, Lng: ${it.longitude}"
                 )
@@ -53,11 +59,24 @@ class LocationForegroundService : Service() {
         }
     }
 
+   private fun sendLocationToJS(latitude: Double, longitude: Double) {
+    val moduleInstance = LocationServiceModule.instance
+    if (moduleInstance != null) {
+        moduleInstance.sendLocationEvent(latitude, longitude)
+        Log.d("LocationService", "Event emitted to JS via module instance.")
+    } else {
+        Log.e("LocationService", "LocationServiceModule instance is null!")
+    }
+}
+
+
+
+
     private fun createNotification(content: String): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Foreground Location Service")
             .setContentText(content)
-            .setSmallIcon(R.mipmap.ic_launcher)  // replace with your icon
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
     }

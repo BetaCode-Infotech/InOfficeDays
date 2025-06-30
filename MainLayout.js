@@ -2,7 +2,7 @@ import {View, Text, PermissionsAndroid, Alert} from 'react-native';
 import React, {useEffect} from 'react';
 import StackNavigator from './src/navigator/Stack/StackNavigator';
 import {RenderDataOnLoad} from './src/utils/RenderDataOnLoad';
-import {backgroundTask} from './BackgroundJobs';
+import {backgroundTask, startListeningForLocation} from './BackgroundJobs';
 // import RenderDataOnLoad from './src/utils/RenderDataOnLoad';
 import {
   startLocationService,
@@ -11,21 +11,30 @@ import {
 } from './src/utils/NativeLocationService';
 const MainLayout = () => {
   useEffect(() => {
-    // requestPermissions();
-    console.log("main layout");
-    requestLocationPermission().then(granted => {
-      console.log("sjcjsdhjhj", granted);
-      if (granted) {
-        console.log('All permissions granted');
-        startLocationService();
-        backgroundTask();
-      }
-    }).catch(err => {
-      console.error('Error requesting permissions:', err);
-     
-    }
-    );
+    console.log('App Layout mounted');
+
+    // setup DeviceEventEmitter listener immediately on app launch
+    const unsubscribe = startListeningForLocation();
+
+    // request permissions and start service separately
+    requestLocationPermission()
+      .then(granted => {
+        console.log('Permissions granted:', granted);
+        if (granted) {
+          startLocationService();
+          // backgroundTask();
+        }
+      })
+      .catch(err => {
+        console.error('Error requesting permissions:', err);
+      });
+
+    return () => {
+      // cleanup event listener on unmount
+      unsubscribe();
+    };
   }, []);
+  
   
   
 

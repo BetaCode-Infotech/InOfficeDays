@@ -8,6 +8,9 @@ import {useSelector} from 'react-redux';
 import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
+import {NativeModules, NativeEventEmitter} from 'react-native';
+const {LocationServiceModule} = NativeModules;
+const locationEventEmitter = new NativeEventEmitter(LocationServiceModule);
 
 export const backgroundTask = async () => {
   createChannels();
@@ -22,7 +25,7 @@ export const backgroundTask = async () => {
     },
     async taskId => {
       console.log('[BackgroundFetch] Received taskId: ', taskId);
-      await handleNotification(`Task received: ${taskId}`);
+      await handleBackgroundTask(`Task received: ${taskId}`);
       BackgroundFetch.finish(taskId);
     },
     async taskId => {
@@ -147,11 +150,19 @@ const handleBackgroundTask = async message => {
     return;
   }
 
-  const data = await getCurrentLatLong();
+  let data 
+  if(message){
+    data = message;
+  }else{
+
+    data= await getCurrentLatLong();
+  }
 
   const matches = findMatchingLocations(data, locationData);
 
   let payload = [];
+
+
   if (matches && matches.length > 0) {
     matches.map(val => {
       payload.push({
@@ -160,24 +171,28 @@ const handleBackgroundTask = async message => {
       });
     });
 
-    await axios
-      .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
-      .then(response => {
-        console.log('asdasdasdas', response.data);
-        sendNotification(
-          'Background Location Update!',
-          `${message}\nLat: ${data.latitude}\nLng: ${data.longitude}`,
-          'red',
-        );
-      })
-      .catch(err => {
-        console.log('asdasdasdas', err);
-      });
+    pushDataToServer(payload);
     console.log('Matching Locations:', matches);
     console.log('locationData', locationData, data);
 
     // Push notification with lat/long
   }
+};
+const pushDataToServer = async payload => {
+  console.log("hbdjhsbhj", payload);
+  await axios
+    .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
+    .then(response => {
+      console.log('asdasdasdas', response.data);
+      sendNotification(
+        'Dude! Thats the spirit',
+        'Yay! You completed one more day',
+        'blue',
+      );
+    })
+    .catch(err => {
+      console.log('asdasdasdas1', err);
+    });
 };
 
 const sendNotification = async (title, message, color) => {
@@ -199,7 +214,28 @@ export const backgroundHeadlessTask = async event => {
   console.log('[BackgroundFetch HeadlessTask] start: ', event.taskId);
 
   createChannels();
-  handleBackgroundTask(`Headless Task received: ${event.taskId}`);
+  handleBackgroundTask(); // Placeholder for actual message
 
   BackgroundFetch.finish(event.taskId);
 };
+
+
+export const startListeningForLocation = () => {
+  console.log('Registering NativeEventEmitter listener...');
+
+  const subscription = locationEventEmitter.addListener(
+    'locationUpdate',
+    location => {
+      console.log('Got location from native:', location);
+      handleBackgroundTask(location);
+    },
+  );
+
+  return () => {
+    subscription.remove();
+  };
+};
+
+
+
+
