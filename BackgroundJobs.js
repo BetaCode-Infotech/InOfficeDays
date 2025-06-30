@@ -9,15 +9,12 @@ import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
 
-
 export const backgroundTask = async () => {
-  // First, create notification channel
   createChannels();
-  handleNotification('asbcd');
 
   let status = await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 1, // Fetch interval in minutes
+      minimumFetchInterval: 15, // 15 min is Android's actual reliable min interval
       stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
@@ -25,9 +22,7 @@ export const backgroundTask = async () => {
     },
     async taskId => {
       console.log('[BackgroundFetch] Received taskId: ', taskId);
-      // Send a notification when any task is received
-      handleNotification(`Task received: ${taskId}`);
-
+      await handleNotification(`Task received: ${taskId}`);
       BackgroundFetch.finish(taskId);
     },
     async taskId => {
@@ -36,18 +31,17 @@ export const backgroundTask = async () => {
     },
   );
 
-  // Optional: Schedule a custom task
   BackgroundFetch.scheduleTask({
     taskId: 'com.foo.customtask',
     forceAlarmManager: true,
-    delay: 500, // milliseconds
+    delay: 1000,
   });
 };
 
 const createChannels = () => {
   PushNotification.createChannel(
     {
-      channelId: 'test-channel', // ID
+      channelId: 'channel-1', // ID
       channelName: 'Test Channel', // Name
       importance: 4, // Max importance
       vibrate: true,
@@ -103,7 +97,6 @@ const getCurrentLatLong = () => {
       },
     );
   });
-
 };
 
 const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
@@ -144,7 +137,7 @@ const findMatchingLocations = (currentLocation, locationData) => {
   });
 };
 
-const handleNotification = async message => {
+const handleBackgroundTask = async message => {
   const state = store.getState();
   const locationData = state.locationData.locationList;
 
@@ -171,36 +164,42 @@ const handleNotification = async message => {
       .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
       .then(response => {
         console.log('asdasdasdas', response.data);
+        sendNotification(
+          'Background Location Update!',
+          `${message}\nLat: ${data.latitude}\nLng: ${data.longitude}`,
+          'red',
+        );
       })
       .catch(err => {
         console.log('asdasdasdas', err);
       });
+    console.log('Matching Locations:', matches);
+    console.log('locationData', locationData, data);
+
+    // Push notification with lat/long
   }
+};
 
-  console.log('Matching Locations:', matches);
-  console.log('locationData', locationData, data);
-
-  // Push notification with lat/long
+const sendNotification = async (title, message, color) => {
   PushNotification.localNotification({
-    channelId: 'test-channel',
-    title: 'Background Location Update!',
-    message: `${message}\nLat: ${data.latitude}\nLng: ${data.longitude}`,
-    color: 'red',
+    channelId: 'channel-1',
+    title: title,
+    message: message,
+    color: color,
     vibrate: true,
     vibration: 300,
     playSound: true,
     soundName: 'default',
   });
 
-  Vibration.vibrate([0, 200, 100, 300]);
+  // Vibration.vibrate([0, 200, 100, 300]);
 };
 
 export const backgroundHeadlessTask = async event => {
   console.log('[BackgroundFetch HeadlessTask] start: ', event.taskId);
-  
 
   createChannels();
-  handleNotification(`Headless Task received: ${event.taskId}`);
-  
+  handleBackgroundTask(`Headless Task received: ${event.taskId}`);
+
   BackgroundFetch.finish(event.taskId);
 };

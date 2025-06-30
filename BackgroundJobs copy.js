@@ -47,7 +47,7 @@ export const backgroundTask = async () => {
 const createChannels = () => {
   PushNotification.createChannel(
     {
-      channelId: 'test-channel', // ID
+      channelId: 'channel-1', // ID
       channelName: 'Test Channel', // Name
       importance: 4, // Max importance
       vibrate: true,
@@ -182,7 +182,7 @@ const handleNotification = async message => {
 
   // Push notification with lat/long
   PushNotification.localNotification({
-    channelId: 'test-channel',
+    channelId: 'channel-1',
     title: 'Background Location Update!',
     message: `${message}\nLat: ${data.latitude}\nLng: ${data.longitude}`,
     color: 'red',
