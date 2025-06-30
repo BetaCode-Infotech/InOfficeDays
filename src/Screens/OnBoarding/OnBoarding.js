@@ -174,7 +174,7 @@ const OnBoarding = props => {
       /> */}
         <CustomButton
           label="Get Started"
-          color={COLORS.primary}
+          color={COLORS.black}
           containerStyle={{
             width: width - 100,
             padding: 20,
