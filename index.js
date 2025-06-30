@@ -13,6 +13,6 @@ PushNotification.configure({
     console.log('NOTIFICATION:', notification);
   },
 });
-BackgroundFetch.registerHeadlessTask(backgroundHeadlessTask);
+// BackgroundFetch.registerHeadlessTask(backgroundHeadlessTask);
 
 AppRegistry.registerComponent(appName, () => App);

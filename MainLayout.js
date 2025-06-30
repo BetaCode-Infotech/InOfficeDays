@@ -4,13 +4,30 @@ import StackNavigator from './src/navigator/Stack/StackNavigator';
 import {RenderDataOnLoad} from './src/utils/RenderDataOnLoad';
 import {backgroundTask} from './BackgroundJobs';
 // import RenderDataOnLoad from './src/utils/RenderDataOnLoad';
-
+import {
+  startLocationService,
+  stopLocationService,
+  requestLocationPermission,
+} from './src/utils/NativeLocationService';
 const MainLayout = () => {
   useEffect(() => {
-    backgroundTask();
-    requestPermissions();
-    requestLocationPermissions();
+    // requestPermissions();
+    console.log("main layout");
+    requestLocationPermission().then(granted => {
+      console.log("sjcjsdhjhj", granted);
+      if (granted) {
+        console.log('All permissions granted');
+        startLocationService();
+        backgroundTask();
+      }
+    }).catch(err => {
+      console.error('Error requesting permissions:', err);
+     
+    }
+    );
   }, []);
+  
+  
 
   const requestLocationPermissions = async () => {
     if (Platform.OS === 'android') {
@@ -87,7 +104,7 @@ const MainLayout = () => {
       );
 
       if (grant === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Permission Granted');
+        console.log('Permission Granted....');
       } else if (grant === PermissionsAndroid.RESULTS.DENIED) {
         console.log('Permission Denied');
         // Ask again with explanation

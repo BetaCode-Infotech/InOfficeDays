@@ -30,14 +30,14 @@ export default function Notification() {
 
   const createChannels = () => {
     PushNotification.createChannel({
-      channelId: 'test-channel',
+      channelId: 'channel-1',
       channelName: 'Test Channel',
     });
   };
 
   const handleNotificationA = () => {
     PushNotification.localNotification({
-      channelId: 'test-channel',
+      channelId: 'channel-1',
       title: 'You clicked on Button A',
       message: 'Hello ' + name + ' Your order is ready',
       color: 'red',
@@ -49,7 +49,7 @@ export default function Notification() {
 
   const handleNotificationB = () => {
     PushNotification.localNotification({
-      channelId: 'test-channel',
+      channelId: 'channel-1',
       title: 'You clicked on Button A',
       message: 'Hello ' + name + ' Your order is ready',
       bigText: 'Thanks ' + name + ' for Ordering food from Button B store ',
