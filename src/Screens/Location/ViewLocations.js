@@ -15,6 +15,7 @@ import {
   Keyboard,
   TextInput,
   Dimensions,
+  PermissionsAndroid,
 } from 'react-native';
 import React, {useState, useMemo, useEffect, useRef} from 'react';
 import Header from '../../../components/Header/Header';
