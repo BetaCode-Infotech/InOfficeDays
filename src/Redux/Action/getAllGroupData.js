@@ -78,3 +78,7 @@ export const getHistoryByTrackingID =
       return {error};
     }
   };
+export const setBackgroundActivity = payload => ({
+  type: 'BACKGROUND_ACTIVITY',
+  payload,
+});

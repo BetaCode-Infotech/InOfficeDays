@@ -352,7 +352,6 @@ const ViewLocations = props => {
     const lat = latitude;
     const lng = longitude;
     const apiKey = GOOGLE_MAPS_API_KEY;
-    console.log('asdasdasdasasds', apiKey);
 
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
 
@@ -558,9 +557,6 @@ const ViewLocations = props => {
                   </View>
                 )}
               />
-
-              <Text>{updatedData.RADIUS}</Text>
-
               <View style={{height: 300, marginTop: 20}}>
                 <MapView
                   provider={PROVIDER_GOOGLE} // remove if not using Google Maps

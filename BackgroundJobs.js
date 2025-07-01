@@ -9,13 +9,14 @@ import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
 import {NativeModules, NativeEventEmitter} from 'react-native';
+import {setBackgroundActivity} from './src/Redux/Action/getAllGroupData';
 const {LocationServiceModule} = NativeModules;
 const locationEventEmitter = new NativeEventEmitter(LocationServiceModule);
 
 export const backgroundTask = async () => {
-  createChannels();
+  createNotificationChannels();
 
-  let status = await BackgroundFetch.configure(
+  await BackgroundFetch.configure(
     {
       minimumFetchInterval: 15, // 15 min is Android's actual reliable min interval
       stopOnTerminate: false,
@@ -41,7 +42,7 @@ export const backgroundTask = async () => {
   });
 };
 
-const createChannels = () => {
+export const createNotificationChannels = () => {
   PushNotification.createChannel(
     {
       channelId: 'channel-1', // ID
@@ -139,37 +140,65 @@ const findMatchingLocations = (currentLocation, locationData) => {
     return distance <= radiusInMeters;
   });
 };
+function formatDateToDDMMYYYY(isoDate) {
+  const date = new Date(isoDate);
 
-const handleBackgroundTask = async message => {
+  // Extract day, month, and year
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const year = date.getFullYear();
+
+  // Format the date as DD/MM/YYYY
+  return `${day}/${month}/${year}`;
+}
+
+const handleBackgroundTask = async location => {
   const state = store.getState();
-  const locationData = state.locationData.locationList;
+  console.log('askdmaskdasd', state);
+
+  let locationData = state.locationData.locationList;
+  let backgroundActivityData =
+    state.backgroundActivityData.backgroundActivityList;
+  const today = new Date();
+
+  const filteredLocationData = locationData.filter(location => {
+    return !backgroundActivityData.some(
+      activity =>
+        activity.GROUP_ID === location.GROUP_ID &&
+        activity.LOCATION_ID === location._id &&
+        formatDateToDDMMYYYY(activity.DATE) === formatDateToDDMMYYYY(today),
+    );
+  });
 
   const hasPermission = await requestLocationPermission();
   if (!hasPermission) {
     console.log('Location permission denied');
     return;
   }
+  console.log('sdasmdsadasdsa', hasPermission);
 
-  let data 
-  if(message){
-    data = message;
-  }else{
-
-    data= await getCurrentLatLong();
+  let data;
+  if (location) {
+    data = location;
+  } else {
+    data = await getCurrentLatLong();
   }
 
-  const matches = findMatchingLocations(data, locationData);
+  const matches = findMatchingLocations(data, filteredLocationData);
+  console.log('asdasmdasdas', matches);
 
   let payload = [];
-
 
   if (matches && matches.length > 0) {
     matches.map(val => {
       payload.push({
         GROUP_ID: val.GROUP_ID,
         LOCATION_ID: val._id,
+        DATE: new Date(),
+        DATA_PUSHED_TO_SERVER: false,
       });
     });
+    store.dispatch(setBackgroundActivity(payload));
 
     pushDataToServer(payload);
     console.log('Matching Locations:', matches);
@@ -179,16 +208,24 @@ const handleBackgroundTask = async message => {
   }
 };
 const pushDataToServer = async payload => {
-  console.log("hbdjhsbhj", payload);
+  console.log('hbdjhsbhj', payload);
   await axios
     .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
     .then(response => {
-      console.log('asdasdasdas', response.data);
-      sendNotification(
-        'Dude! Thats the spirit',
-        'Yay! You completed one more day',
-        'blue',
-      );
+      console.log('manslaSasaSa', response.data);
+
+      if (response.data.incremented == true) {
+        const NotificationData = [...response.data.notificationData];
+        NotificationData.forEach(val => {
+          sendNotification(
+            val.NOTIFICATION_TITLE,
+            val.NOTIFICATION_DESCRIPTION,
+            'red',
+          );
+        });
+
+        // store.dispatch(setBackgroundActivity(payload));
+      }
     })
     .catch(err => {
       console.log('asdasdasdas1', err);
@@ -202,23 +239,19 @@ const sendNotification = async (title, message, color) => {
     message: message,
     color: color,
     vibrate: true,
-    vibration: 300,
-    playSound: true,
-    soundName: 'default',
+    vibration: [0, 200, 100, 300], // Standardized pattern
   });
-
-  // Vibration.vibrate([0, 200, 100, 300]);
+  Vibration.vibrate([0, 200, 100, 300]);
 };
 
 export const backgroundHeadlessTask = async event => {
   console.log('[BackgroundFetch HeadlessTask] start: ', event.taskId);
 
-  createChannels();
+  createNotificationChannels();
   handleBackgroundTask(); // Placeholder for actual message
 
   BackgroundFetch.finish(event.taskId);
 };
-
 
 export const startListeningForLocation = () => {
   console.log('Registering NativeEventEmitter listener...');
@@ -236,6 +269,34 @@ export const startListeningForLocation = () => {
   };
 };
 
+export const requestNotificationPermissions = async () => {
+  try {
+    const grant = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
 
+    if (grant === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('Notification Permission Granted');
+    } else {
+      console.log('Notification Permission Denied');
 
-
+      // Ask the user if they'd like to grant it again
+      Alert.alert(
+        'Permission Needed',
+        'This app needs notification permission to keep you updated. Would you like to enable it?',
+        [
+          {
+            text: 'Ask Again',
+            onPress: () => requestNotificationPermissions(),
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+      );
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+};
