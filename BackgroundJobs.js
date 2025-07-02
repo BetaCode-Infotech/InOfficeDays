@@ -136,7 +136,7 @@ const findMatchingLocations = (currentLocation, locationData) => {
       targetLat,
       targetLng,
     );
-
+console.log("dhfbdjh",distance, radiusInMeters);
     return distance <= radiusInMeters;
   });
 };
@@ -160,7 +160,7 @@ const handleBackgroundTask = async location => {
   let backgroundActivityData =
     state.backgroundActivityData.backgroundActivityList;
   const today = new Date();
-
+console.log("kjdsfjks",backgroundActivityData);
   const filteredLocationData = locationData.filter(location => {
     return !backgroundActivityData.some(
       activity =>
@@ -183,7 +183,9 @@ const handleBackgroundTask = async location => {
   } else {
     data = await getCurrentLatLong();
   }
-
+console.log('dksjfksjd', filteredLocationData);
+console.log('dksjfksjd1', locationData);
+console.log('dksjfksjd2', data);
   const matches = findMatchingLocations(data, filteredLocationData);
   console.log('asdasmdasdas', matches);
 
@@ -198,12 +200,11 @@ const handleBackgroundTask = async location => {
         DATA_PUSHED_TO_SERVER: false,
       });
     });
-    store.dispatch(setBackgroundActivity(payload));
 
     pushDataToServer(payload);
     console.log('Matching Locations:', matches);
     console.log('locationData', locationData, data);
-
+    
     // Push notification with lat/long
   }
 };
@@ -213,9 +214,12 @@ const pushDataToServer = async payload => {
     .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
     .then(response => {
       console.log('manslaSasaSa', response.data);
+      store.dispatch(setBackgroundActivity(payload));
 
-      if (response.data.incremented == true) {
-        const NotificationData = [...response.data.notificationData];
+      if (response.data.some(val => val.incremented == true)) {
+        const NotificationData = response.data.filter(
+          val => val.incremented == true,
+        );
         NotificationData.forEach(val => {
           sendNotification(
             val.NOTIFICATION_TITLE,

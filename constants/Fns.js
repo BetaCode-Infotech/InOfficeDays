@@ -76,7 +76,7 @@ export const CategoryList = [
     icon: Icons.workspace,
   },
   {
-    label: 'Meet Girlfriend',
+    label: 'Meet Partner',
     value: 3,
     icon: Icons.hearts,
   },
