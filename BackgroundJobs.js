@@ -9,7 +9,7 @@ import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
 import {NativeModules, NativeEventEmitter} from 'react-native';
-import {setBackgroundActivity} from './src/Redux/Action/getAllGroupData';
+import {deleteOldBackgroundActivities, setBackgroundActivity} from './src/Redux/Action/getAllGroupData';
 const {LocationServiceModule} = NativeModules;
 const locationEventEmitter = new NativeEventEmitter(LocationServiceModule);
 
@@ -159,13 +159,17 @@ const handleBackgroundTask = async location => {
   let locationData = state.locationData.locationList;
   let backgroundActivityData =
     state.backgroundActivityData.backgroundActivityList;
+   if(backgroundActivityData.some((val)=> val.LAST_DELETED_AT instanceof Date && val.LAST_DELETED_AT.getDate() < new Date().getDate())){
+    store.dispatch(deleteOldBackgroundActivities());
+    backgroundActivityData = state.backgroundActivityData.backgroundActivityList;
+  } 
   const today = new Date();
   console.log('kjdsfjks', backgroundActivityData);
   const filteredLocationData = locationData.filter(location => {
     return !backgroundActivityData.some(
       activity =>
         activity.GROUP_ID === location.GROUP_ID &&
-        activity.LOCATION_ID === location._id &&
+        // activity.LOCATION_ID === location._id &&
         formatDateToDDMMYYYY(activity.DATE) === formatDateToDDMMYYYY(today),
     );
   });
@@ -262,8 +266,16 @@ export const backgroundHeadlessTask = async event => {
 
   BackgroundFetch.finish(event.taskId);
 };
+const isBetweenMidnightAndOneAM = () => {
+  const now = new Date();
+  const hours = now.getHours();
+  return hours >= 0 && hours < 1;
+};
 
 export const startListeningForLocation = () => {
+  // if (isBetweenMidnightAndOneAM()) {
+  //   store.dispatch(deleteOldBackgroundActivities());
+  // }
   console.log('Registering NativeEventEmitter listener...');
 
   const subscription = locationEventEmitter.addListener(

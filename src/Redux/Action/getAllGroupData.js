@@ -82,3 +82,6 @@ export const setBackgroundActivity = payload => ({
   type: 'BACKGROUND_ACTIVITY',
   payload,
 });
+export const deleteOldBackgroundActivities = () => ({
+  type: 'DELETE_OLD_BACKGROUND_ACTIVITIES',
+});
