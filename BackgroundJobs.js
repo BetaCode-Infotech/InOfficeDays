@@ -9,7 +9,10 @@ import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
 import {NativeModules, NativeEventEmitter} from 'react-native';
-import {deleteOldBackgroundActivities, setBackgroundActivity} from './src/Redux/Action/getAllGroupData';
+import {
+  deleteOldBackgroundActivities,
+  setBackgroundActivity,
+} from './src/Redux/Action/getAllGroupData';
 const {LocationServiceModule} = NativeModules;
 const locationEventEmitter = new NativeEventEmitter(LocationServiceModule);
 
@@ -159,12 +162,27 @@ const handleBackgroundTask = async location => {
   let locationData = state.locationData.locationList;
   let backgroundActivityData =
     state.backgroundActivityData.backgroundActivityList;
-   if(backgroundActivityData.some((val)=> val.LAST_DELETED_AT instanceof Date && val.LAST_DELETED_AT.getDate() < new Date().getDate())){
-    store.dispatch(deleteOldBackgroundActivities());
-    backgroundActivityData = state.backgroundActivityData.backgroundActivityList;
-  } 
-  const today = new Date();
   console.log('kjdsfjks', backgroundActivityData);
+
+  console.log(
+    'hsgadjcfshagfdgsj',
+    !backgroundActivityData.some(item => 'LAST_DELETED_AT' in item),
+  );
+
+  if (
+    backgroundActivityData.some(
+      val =>
+        val.LAST_DELETED_AT instanceof Date &&
+        val.LAST_DELETED_AT.getDate() < new Date().getDate(),
+    ) ||
+    !backgroundActivityData.some(item => 'LAST_DELETED_AT' in item)
+  ) {
+    store.dispatch(deleteOldBackgroundActivities());
+    backgroundActivityData =
+      state.backgroundActivityData.backgroundActivityList;
+    console.log('jkndkjsn', backgroundActivityData);
+  }
+  const today = new Date();
   const filteredLocationData = locationData.filter(location => {
     return !backgroundActivityData.some(
       activity =>
