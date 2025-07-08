@@ -85,11 +85,8 @@ function Dashboard(props) {
       })
       .then(async response => {
         await props.getTrackingByUserData(props.AUTH_DATA?._id);
-
-        console.log('Logout ', response.data);
       })
       .catch(err => {
-        console.log('err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,

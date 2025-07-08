@@ -116,7 +116,6 @@ const SingIn = props => {
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         Alert.alert('Play Services Not Available');
       } else {
-        console.error(error);
         Alert.alert('Some error occurred');
       }
     }

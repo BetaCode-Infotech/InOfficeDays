@@ -57,19 +57,12 @@ const OTPVerification = props => {
 
     if (isValidOtp) {
       setVisible(true);
-      console.log('asdknasjdas', {
-        USER_EMAIL: EMAIL.EMAIL,
-        OTP: otp,
-      });
-
       await axios
         .post(Axios.axiosUrl + Axios.loginOTPVerify, {
           USER_EMAIL: EMAIL.EMAIL,
           OTP: otp,
         })
         .then(response => {
-          console.log('sadnsadjkasdasd', response.data);
-
           if (response.data.LOGIN == true) {
             setVisible(false);
             dispatch({
@@ -97,8 +90,6 @@ const OTPVerification = props => {
         })
         .catch(err => {
           setVisible(false);
-
-          console.log('error', err);
         });
     } else {
       Toast.show({
@@ -151,7 +142,6 @@ const OTPVerification = props => {
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
             onCodeFilled={code => {
               setOtp(code);
-              console.log(`Code is ${code}, you are good to go!`);
             }}
           />
         </View>

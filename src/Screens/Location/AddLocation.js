@@ -125,18 +125,15 @@ const AddLocation = props => {
       .catch(err => {
         setLoading(false);
 
-        console.log('Err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
         });
         Vibration.vibrate(PATTERN);
       });
-    console.log('Location saved:', {locationName, googleLocation, radius});
   };
   useEffect(() => {
     setGroupData(props.GROUP_DATA);
-    console.log('Group_Data:', props.GROUP_DATA);
   }, [props.GROUP_DATA]);
   const handleMapPress = event => {
     const {coordinate} = event.nativeEvent;
@@ -149,7 +146,6 @@ const AddLocation = props => {
     const lat = latitude;
     const lng = longitude;
     const apiKey = GOOGLE_MAPS_API_KEY;
-    console.log('asdasdasdasasds', apiKey);
 
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
 
@@ -158,15 +154,11 @@ const AddLocation = props => {
       const data = await response.json();
       if (data.status === 'OK') {
         const address = data.results[0]?.formatted_address;
-        console.log('Place name:', address);
         setLocationName(address);
         return address;
       } else {
-        console.error('Geocoding error:', data.status);
       }
-    } catch (error) {
-      console.error('Fetch error:', error);
-    }
+    } catch (error) {}
   };
 
   const goToMyLocation = async () => {
@@ -176,7 +168,6 @@ const AddLocation = props => {
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         );
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          console.warn('Location permission denied');
           return;
         }
       }
@@ -196,9 +187,7 @@ const AddLocation = props => {
         error => console.error(error.message),
         {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
       );
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   return (

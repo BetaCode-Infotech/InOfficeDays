@@ -75,7 +75,6 @@ const ViewLocations = props => {
   const [groupData, setGroupData] = useState([]);
   useEffect(() => {
     setGroupData(props.GROUP_DATA);
-    console.log('Group_Data:', props.GROUP_DATA);
   }, [props.GROUP_DATA]);
   const optionsIconRef = useRef(null);
   const openPopover = () => {
@@ -87,7 +86,6 @@ const ViewLocations = props => {
   };
 
   // const handleOptionSelect = option => {
-  //   console.log('Selected option:', option);
   //   closePopover();
   // };
   const handleOptionSelect = option => {
@@ -110,8 +108,6 @@ const ViewLocations = props => {
         IS_ACTIVE: false,
       })
       .then(response => {
-        console.log('Deleted!');
-
         Toast.show({
           type: 'success',
           text1: `Location Deleted`,
@@ -120,7 +116,6 @@ const ViewLocations = props => {
         props.getLocationByUserData(props.AUTH_DATA?._id);
       })
       .catch(err => {
-        console.log('Err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
@@ -180,7 +175,6 @@ const ViewLocations = props => {
           ref={optionsIconRef}
           style={styles.optionsIconContainer}
           onPress={() => {
-            console.log('Options pressed for:', item);
             openPopover();
             setCurrentPopoverData(item);
             setUpdatedData(item);
@@ -272,7 +266,6 @@ const ViewLocations = props => {
       newErrors.radius = 'Radius is required.';
 
     setErrors(newErrors);
-    console.log('onSave called', newErrors);
 
     if (Object.keys(newErrors).length > 0) return;
     setLoading(true);
@@ -300,14 +293,12 @@ const ViewLocations = props => {
       .catch(err => {
         setLoading(false);
 
-        console.log('Err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
         });
         Vibration.vibrate(PATTERN);
       });
-    console.log('Location saved:', {locationName, googleLocation, radius});
   };
 
   const goToMyLocation = async () => {
@@ -317,7 +308,6 @@ const ViewLocations = props => {
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         );
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          console.warn('Location permission denied');
           return;
         }
       }
@@ -337,9 +327,7 @@ const ViewLocations = props => {
         error => console.error(error.message),
         {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
       );
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   const handleMapPress = event => {
@@ -360,15 +348,11 @@ const ViewLocations = props => {
       const data = await response.json();
       if (data.status === 'OK') {
         const address = data.results[0]?.formatted_address;
-        console.log('Place name:', address);
         setLocationName(address);
         return address;
       } else {
-        console.error('Geocoding error:', data.status);
       }
-    } catch (error) {
-      console.error('Fetch error:', error);
-    }
+    } catch (error) {}
   };
   // --------------------------------------------
   return (

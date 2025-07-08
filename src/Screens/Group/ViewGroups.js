@@ -85,8 +85,6 @@ const ViewGroups = props => {
         GROUP_ID: currentPopoverData._id,
       })
       .then(response => {
-        console.log('Deleted!');
-
         Toast.show({
           type: 'success',
           text1: `Location Deleted`,
@@ -95,7 +93,6 @@ const ViewGroups = props => {
         props.getGroupByUserData(props.AUTH_DATA?._id);
       })
       .catch(err => {
-        console.log('Err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
@@ -126,7 +123,6 @@ const ViewGroups = props => {
     if (!milestoneDays) newErrors.milestoneDays = 'Location is required.';
 
     setErrors(newErrors);
-    console.log('onSave called', newErrors);
 
     if (Object.keys(newErrors).length > 0) return;
     setLoading(true);
@@ -153,7 +149,6 @@ const ViewGroups = props => {
       .catch(err => {
         setLoading(false);
 
-        console.log('Err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,
@@ -197,7 +192,6 @@ const ViewGroups = props => {
           ref={optionsIconRef}
           style={styles.optionsIconContainer}
           onPress={() => {
-            console.log('Options pressed for:', item);
             openPopover();
             setCurrentPopoverData(item);
             setUpdatedData(item);

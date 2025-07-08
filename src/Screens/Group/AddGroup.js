@@ -40,8 +40,6 @@ const categoryOptions = [
   {label: 'Finance', value: 'finance', icon: Icons.email},
 ];
 
-
-
 function AddGroup(props) {
   const navigation = useNavigation();
 
@@ -123,7 +121,7 @@ function AddGroup(props) {
       });
     // Optionally reset form or show success UI
   };
-  
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View

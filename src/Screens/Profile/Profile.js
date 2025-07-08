@@ -30,6 +30,8 @@ const Profile = props => {
   const dispatch = useDispatch();
 
   const [userDetails, setUserDetails] = useState({});
+  console.log('Adnasdasdas', userDetails);
+
   useEffect(() => {
     setUserDetails({
       ...props.AUTH_DATA,
@@ -66,9 +68,7 @@ const Profile = props => {
       .post(Axios.axiosUrl + Axios.userLogout, {
         SESSION_ID: props.AUTH_DATA?.SESSION_ID,
       })
-      .then(response => {
-        console.log('Logout ', response.data);
-      })
+      .then(response => {})
       .catch(err => {
         console.log('err', err);
       });

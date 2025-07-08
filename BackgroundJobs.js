@@ -21,19 +21,17 @@ export const backgroundTask = async () => {
 
   await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 15, // 15 min is Android's actual reliable min interval
+      minimumFetchInterval: 30, // 30 min is Android's actual reliable min interval
       stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
       forceAlarmManager: true,
     },
     async taskId => {
-      console.log('[BackgroundFetch] Received taskId: ', taskId);
       await handleBackgroundTask(`Task received: ${taskId}`);
       BackgroundFetch.finish(taskId);
     },
     async taskId => {
-      console.log('[BackgroundFetch] TIMEOUT taskId:', taskId);
       BackgroundFetch.finish(taskId);
     },
   );
@@ -89,12 +87,9 @@ const getCurrentLatLong = () => {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        console.log('Latitude:', latitude);
-        console.log('Longitude:', longitude);
         resolve({latitude, longitude});
       },
       error => {
-        console.error('Location error:', error);
         reject(error);
       },
       {
@@ -139,7 +134,6 @@ const findMatchingLocations = (currentLocation, locationData) => {
       targetLat,
       targetLng,
     );
-    console.log('dhfbdjh', distance, radiusInMeters);
     return distance <= radiusInMeters;
   });
 };
@@ -157,17 +151,10 @@ function formatDateToDDMMYYYY(isoDate) {
 
 const handleBackgroundTask = async location => {
   const state = store.getState();
-  console.log('askdmaskdasd', state);
 
   let locationData = state.locationData.locationList;
   let backgroundActivityData =
     state.backgroundActivityData.backgroundActivityList;
-  console.log('kjdsfjks', backgroundActivityData);
-
-  console.log(
-    'hsgadjcfshagfdgsj',
-    !backgroundActivityData.some(item => 'LAST_DELETED_AT' in item),
-  );
 
   if (
     backgroundActivityData.some(
@@ -180,7 +167,6 @@ const handleBackgroundTask = async location => {
     store.dispatch(deleteOldBackgroundActivities());
     backgroundActivityData =
       state.backgroundActivityData.backgroundActivityList;
-    console.log('jkndkjsn', backgroundActivityData);
   }
   const today = new Date();
   const filteredLocationData = locationData.filter(location => {
@@ -194,10 +180,8 @@ const handleBackgroundTask = async location => {
 
   const hasPermission = await requestLocationPermission();
   if (!hasPermission) {
-    console.log('Location permission denied');
     return;
   }
-  console.log('sdasmdsadasdsa', hasPermission);
 
   let data;
   if (location) {
@@ -205,12 +189,7 @@ const handleBackgroundTask = async location => {
   } else {
     data = await getCurrentLatLong();
   }
-  console.log('dksjfksjd', filteredLocationData);
-  console.log('dksjfksjd1', locationData);
-  console.log('dksjfksjd2', data);
   const matches = findMatchingLocations(data, filteredLocationData);
-  console.log('asdasmdasdas', matches);
-
   let payload = [];
 
   if (matches && matches.length > 0) {
@@ -224,30 +203,19 @@ const handleBackgroundTask = async location => {
     });
 
     pushDataToServer(payload);
-    console.log('Matching Locations:', matches);
-    console.log('locationData', locationData, data);
-
     // Push notification with lat/long
   }
 };
 const pushDataToServer = async payload => {
-  console.log('hbdjhsbhj', payload);
   await axios
     .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
     .then(response => {
-      console.log('manslaSasaSa', response.data);
-      console.log(
-        'manslaSasaSa1',
-        response.data.some(val => val.incremented == true),
-      );
       store.dispatch(setBackgroundActivity(payload));
 
       if (response.data.some(val => val.incremented == true)) {
         const NotificationData = response.data.filter(
           val => val.incremented == true,
         );
-        console.log('bdfhgshsh', NotificationData);
-
         NotificationData.forEach(val => {
           sendNotification(
             val.notificationData.NOTIFICATION_TITLE,
@@ -277,8 +245,6 @@ const sendNotification = async (title, message, color) => {
 };
 
 export const backgroundHeadlessTask = async event => {
-  console.log('[BackgroundFetch HeadlessTask] start: ', event.taskId);
-
   createNotificationChannels();
   handleBackgroundTask(); // Placeholder for actual message
 
@@ -294,12 +260,10 @@ export const startListeningForLocation = () => {
   // if (isBetweenMidnightAndOneAM()) {
   //   store.dispatch(deleteOldBackgroundActivities());
   // }
-  console.log('Registering NativeEventEmitter listener...');
 
   const subscription = locationEventEmitter.addListener(
     'locationUpdate',
     location => {
-      console.log('Got location from native:', location);
       handleBackgroundTask(location);
     },
   );
@@ -316,10 +280,7 @@ export const requestNotificationPermissions = async () => {
     );
 
     if (grant === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('Notification Permission Granted');
     } else {
-      console.log('Notification Permission Denied');
-
       // Ask the user if they'd like to grant it again
       Alert.alert(
         'Permission Needed',
