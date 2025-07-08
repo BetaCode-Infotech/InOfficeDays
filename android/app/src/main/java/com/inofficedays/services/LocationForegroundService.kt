@@ -32,7 +32,7 @@ class LocationForegroundService : Service() {
 
     private fun startLocationUpdates() {
         val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 1800000 // 1 minute interval
+            Priority.PRIORITY_HIGH_ACCURACY, 1800000 //30 min interval || 1 minute interval= 60k,
         ).setMinUpdateDistanceMeters(0f)
             .build()
 
@@ -45,7 +45,6 @@ class LocationForegroundService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             val location: Location? = locationResult.lastLocation
             location?.let {
-                Log.d("LocationService", "Lat: ${it.latitude}, Lng: ${it.longitude}")
 
                 sendLocationToJS(it.latitude, it.longitude)
                 //Sending Notification everytime location is picked
@@ -65,7 +64,6 @@ class LocationForegroundService : Service() {
     val moduleInstance = LocationServiceModule.instance
     if (moduleInstance != null) {
         moduleInstance.sendLocationEvent(latitude, longitude)
-        Log.d("LocationService", "Event emitted to JS via module instance.")
     } else {
         Log.e("LocationService", "LocationServiceModule instance is null!")
     }

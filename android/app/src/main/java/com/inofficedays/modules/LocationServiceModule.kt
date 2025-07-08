@@ -24,7 +24,6 @@ class LocationServiceModule(private val reactContext: ReactApplicationContext) :
     @ReactMethod
     fun startService() {
         val intent = Intent(reactContext, LocationForegroundService::class.java)
-        Log.d("LocationServiceModule", "startService called")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             reactContext.startForegroundService(intent)
         } else {
@@ -35,7 +34,6 @@ class LocationServiceModule(private val reactContext: ReactApplicationContext) :
     @ReactMethod
     fun stopService() {
         val intent = Intent(reactContext, LocationForegroundService::class.java)
-        Log.d("LocationServiceModule", "stopService called")
         reactContext.stopService(intent)
     }
 
@@ -45,7 +43,6 @@ class LocationServiceModule(private val reactContext: ReactApplicationContext) :
         params.putDouble("latitude", latitude)
         params.putDouble("longitude", longitude)
 
-        Log.d("LocationServiceModule", "Sending event to JS: $params")
 
         reactContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)

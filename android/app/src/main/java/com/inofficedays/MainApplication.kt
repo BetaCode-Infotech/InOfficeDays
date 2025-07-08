@@ -55,7 +55,6 @@ class MainApplication : Application(), ReactApplication {
     // 🔥 Pre-warm React Native bridge context here
     reactNativeHost.reactInstanceManager.createReactContextInBackground()
   }
-    Log.d("MainApplication", "React bridge init called.")
 
 }
 
