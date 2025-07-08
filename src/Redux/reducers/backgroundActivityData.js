@@ -27,7 +27,7 @@ const backgroundActivityData = (state = initialState, action) => {
       const existingIndex = updatedList.findIndex(
         item => item.LAST_DELETED_AT !== undefined,
       );
-
+      
       if (existingIndex !== -1) {
         // If exists, update the value
         updatedList[existingIndex].LAST_DELETED_AT = deletedAt;

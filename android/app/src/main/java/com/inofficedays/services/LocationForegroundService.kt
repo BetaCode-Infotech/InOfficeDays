@@ -32,7 +32,7 @@ class LocationForegroundService : Service() {
 
     private fun startLocationUpdates() {
         val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 60000 // 1 minute interval
+            Priority.PRIORITY_HIGH_ACCURACY, 1800000 // 1 minute interval
         ).setMinUpdateDistanceMeters(0f)
             .build()
 
@@ -48,13 +48,15 @@ class LocationForegroundService : Service() {
                 Log.d("LocationService", "Lat: ${it.latitude}, Lng: ${it.longitude}")
 
                 sendLocationToJS(it.latitude, it.longitude)
-
+                //Sending Notification everytime location is picked
+                /*
                 val notification = createNotification(
                     "Lat: ${it.latitude}, Lng: ${it.longitude}"
                 )
                 val notificationManager =
                     getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.notify(1, notification)
+                */
             }
         }
     }
