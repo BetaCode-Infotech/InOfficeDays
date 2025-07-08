@@ -87,6 +87,7 @@ android {
         versionName "1.0"
     }
      signingConfigs {
+        
         release {
         storeFile file("prdkey.jks")
         storePassword "Rahul@1234"       // Replace with actual password
