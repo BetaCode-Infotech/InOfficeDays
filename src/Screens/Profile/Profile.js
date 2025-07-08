@@ -76,6 +76,7 @@ const Profile = props => {
     dispatch({type: 'ALL_TRACKING_LIST', payload: []}); // Use new logout action type
     dispatch({type: 'ALL_LOCATION_LIST', payload: []}); // Use new logout action type
     dispatch({type: 'ALL_GROUP_LIST', payload: []}); // Use new logout action type
+    dispatch({type: 'BACKGROUND_ACTIVITY', payload: []}); // Use new logout action type
     navigation.reset({
       index: 0,
       routes: [{name: ONBOARDING}], // Reset navigation stack to Onboarding
