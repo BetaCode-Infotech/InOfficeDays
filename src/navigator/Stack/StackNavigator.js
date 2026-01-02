@@ -24,6 +24,14 @@ import Profile from '../../Screens/Profile/Profile';
 import OnBoarding from '../../Screens/OnBoarding/OnBoarding';
 import ProfileEdit from '../../Screens/Profile/ProfileEdit';
 import TrackingHistory from '../../Screens/TrackingHistory/TrackingHistory';
+import {
+  requestLocationPermission,
+  startLocationService,
+} from '../../utils/NativeLocationService';
+import {
+  requestNotificationPermissions,
+  startListeningForLocation,
+} from '../../../BackgroundJobs';
 const Stack = createNativeStackNavigator();
 const StackNavigator = props => {
   const [initialRoute, setInitialRoute] = useState(null);
@@ -38,6 +46,32 @@ const StackNavigator = props => {
       setInitialRoute(ONBOARDING);
     }
   }, [props.AUTH_DATA]);
+  useEffect(() => {
+    const initializeApp = async () => {
+      console.log('App Layout mounted');
+
+      createNotificationChannels();
+
+      // Request location permission first
+      const locationGranted = await requestLocationPermission();
+      console.log('Location Permission:', locationGranted);
+
+      if (locationGranted) {
+        startLocationService();
+        startListeningForLocation(); // Optional: wrap in await if needed
+      }
+
+      // Then request notification permission
+      await requestNotificationPermissions();
+    };
+
+    initializeApp();
+
+    return () => {
+      // cleanup on unmount
+      startListeningForLocation()?.unsubscribe?.(); // optional cleanup if supported
+    };
+  }, []);
 
   if (!initialRoute) return null;
   return (

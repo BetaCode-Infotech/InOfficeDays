@@ -16,6 +16,8 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.google.android.gms.location.*
 import com.inofficedays.modules.LocationServiceModule
+import android.os.Handler
+
 
 class LocationForegroundService : Service() {
 
@@ -41,33 +43,96 @@ class LocationForegroundService : Service() {
         )
     }
 
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            val location: Location? = locationResult.lastLocation
-            location?.let {
+private val locationCallback = object : LocationCallback() {
+    override fun onLocationResult(locationResult: LocationResult) {
+        val location: Location? = locationResult.lastLocation
+        location?.let {
+            Log.d("LocationService", "Location received: ${it.latitude}, ${it.longitude}")
 
-                sendLocationToJS(it.latitude, it.longitude)
-                //Sending Notification everytime location is picked
-                
-                val notification = createNotification(
-                    "Lat: ${it.latitude}, Lng: ${it.longitude}"
-                )
-                val notificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.notify(1, notification)
-                
+            // Call JS sender
+            sendLocationToJS(it.latitude, it.longitude)
+
+            // Sending Notification every time location is picked
+            val notification = createNotification(
+                "Lat: ${it.latitude}, Lng: ${it.longitude}"
+            )
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(1, notification)
+        } ?: run {
+            Log.w("LocationService", "Location is null in callback")
+        }
+    }
+}
+
+
+private val pendingLocations = mutableListOf<Pair<Double, Double>>()
+private var isListenerAttached = false
+private var isReactReady = false
+
+private fun sendLocationToJS(latitude: Double, longitude: Double) {
+    Log.d("LocationService", "📍 Attempting to send to JS: $latitude, $longitude")
+
+    val reactApp = applicationContext as ReactApplication
+    val reactInstanceManager = reactApp.reactNativeHost.reactInstanceManager
+    val currentContext = reactInstanceManager.currentReactContext
+
+    if (isReactReady && currentContext != null && currentContext.hasActiveCatalystInstance()) {
+        val params = Arguments.createMap().apply {
+            putDouble("latitude", latitude)
+            putDouble("longitude", longitude)
+        }
+
+        currentContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit("locationUpdate", params)
+
+        Log.d("LocationService", "✅ Sent location to JS: $latitude, $longitude")
+    } else {
+        Log.w("LocationService", "🕒 ReactContext not ready, queuing location and attaching listener...")
+
+        if (!pendingLocations.contains(Pair(latitude, longitude))) {
+            pendingLocations.add(Pair(latitude, longitude))
+        }
+
+        if (!isListenerAttached) {
+            isListenerAttached = true
+
+            reactInstanceManager.addReactInstanceEventListener(object : ReactInstanceManager.ReactInstanceEventListener {
+                override fun onReactContextInitialized(reactContext: ReactContext) {
+                    Log.d("LocationService", "🚀 ReactContext is now ready. Sending queued locations...")
+                    isReactReady = true
+
+                    for ((lat, lng) in pendingLocations) {
+                        val params = Arguments.createMap().apply {
+                            putDouble("latitude", lat)
+                            putDouble("longitude", lng)
+                        }
+
+                        reactContext
+                            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+                            .emit("locationUpdate", params)
+
+                        Log.d("LocationService", "✅ Sent queued location to JS: $lat, $lng")
+                    }
+
+                    pendingLocations.clear()
+                    isListenerAttached = false
+                    reactInstanceManager.removeReactInstanceEventListener(this)
+                }
+            })
+
+            if (!reactInstanceManager.hasStartedCreatingInitialContext()) {
+                reactInstanceManager.createReactContextInBackground()
             }
         }
     }
-
-   private fun sendLocationToJS(latitude: Double, longitude: Double) {
-    val moduleInstance = LocationServiceModule.instance
-    if (moduleInstance != null) {
-        moduleInstance.sendLocationEvent(latitude, longitude)
-    } else {
-        Log.e("LocationService", "LocationServiceModule instance is null!")
-    }
 }
+
+
+
+
+
 
 
 

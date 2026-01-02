@@ -35,7 +35,7 @@
       android:resource="@color/white"/>
       <meta-data
      android:name="com.google.android.geo.API_KEY"
-     android:value="AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA"/>
+     android:value="AIzaSyBajQmbsoM0NJlsSKOeUQJFcM9c0Hj-e8M"/>
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
         <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />
        <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationBootEventReceiver" android:exported="true">

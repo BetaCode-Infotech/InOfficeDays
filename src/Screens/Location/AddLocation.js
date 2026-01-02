@@ -35,7 +35,7 @@ import {
 import MapView, {Circle, Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation'; // Install this if not already
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyDTWIhZVf2a-guaVMA2sPvUXlcNsmL1CtA';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBajQmbsoM0NJlsSKOeUQJFcM9c0Hj-e8M';
 // import {GOOGLE_MAPS_API_KEY} from '@env';
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
@@ -158,7 +158,9 @@ const AddLocation = props => {
         return address;
       } else {
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log('Error fetching place name:', error);
+    }
   };
 
   const goToMyLocation = async () => {

@@ -13,6 +13,7 @@ import {
   deleteOldBackgroundActivities,
   setBackgroundActivity,
 } from './src/Redux/Action/getAllGroupData';
+import {bufferRadius} from './constants/Fns';
 const {LocationServiceModule} = NativeModules;
 const locationEventEmitter = new NativeEventEmitter(LocationServiceModule);
 
@@ -21,7 +22,7 @@ export const backgroundTask = async () => {
 
   await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 30, // 30 min is Android's actual reliable min interval
+      minimumFetchInterval: 1, // 30 min is Android's actual reliable min interval
       stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
@@ -126,7 +127,8 @@ const findMatchingLocations = (currentLocation, locationData) => {
   return locationData.filter(loc => {
     const targetLat = loc.LOCATION.latitude;
     const targetLng = loc.LOCATION.longitude;
-    const radiusInMeters = parseFloat(loc.RADIUS); // assumed in meters
+
+    const radiusInMeters = parseFloat(loc.RADIUS) + bufferRadius; // assumed in meters
 
     const distance = getDistanceFromLatLonInMeters(
       latitude,
@@ -151,6 +153,7 @@ function formatDateToDDMMYYYY(isoDate) {
 
 const handleBackgroundTask = async location => {
   const state = store.getState();
+  console.log('sadljasdlasdasdas', state);
 
   let locationData = state.locationData.locationList;
   let backgroundActivityData =
@@ -179,6 +182,8 @@ const handleBackgroundTask = async location => {
   });
 
   const hasPermission = await requestLocationPermission();
+  console.log('adjnasdnasdsa', hasPermission);
+  
   if (!hasPermission) {
     return;
   }
@@ -190,6 +195,8 @@ const handleBackgroundTask = async location => {
     data = await getCurrentLatLong();
   }
   const matches = findMatchingLocations(data, filteredLocationData);
+  console.log('dasaskdasdsaasd', matches, data, filteredLocationData);
+
   let payload = [];
 
   if (matches && matches.length > 0) {
@@ -264,6 +271,8 @@ export const startListeningForLocation = () => {
   const subscription = locationEventEmitter.addListener(
     'locationUpdate',
     location => {
+      console.log('jknkjnnjnjknjk', location);
+
       handleBackgroundTask(location);
     },
   );

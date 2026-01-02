@@ -94,3 +94,5 @@ export const frequencyOptions = [
   {label: 'Monthly', value: 'monthly', icon: Icons.email},
   {label: 'Quarterly', value: 'quarterly', icon: Icons.email},
 ];
+
+export const bufferRadius = parseFloat(200);
