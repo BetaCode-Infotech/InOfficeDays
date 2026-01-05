@@ -8,25 +8,31 @@ import {useSelector} from 'react-redux';
 import {store} from './src/Redux/Store';
 import axios from 'axios';
 import Axios from './src/utils/Axios';
+import {NativeModules, NativeEventEmitter} from 'react-native';
+import {
+  deleteOldBackgroundActivities,
+  setBackgroundActivity,
+} from './src/Redux/Action/getAllGroupData';
+import {bufferRadius} from './constants/Fns';
+const {LocationServiceModule} = NativeModules;
+const locationEventEmitter = new NativeEventEmitter(LocationServiceModule);
 
 export const backgroundTask = async () => {
-  createChannels();
+  createNotificationChannels();
 
-  let status = await BackgroundFetch.configure(
+  await BackgroundFetch.configure(
     {
-      minimumFetchInterval: 15, // 15 min is Android's actual reliable min interval
+      minimumFetchInterval: 1, // 30 min is Android's actual reliable min interval
       stopOnTerminate: false,
       startOnBoot: true,
       enableHeadless: true,
       forceAlarmManager: true,
     },
     async taskId => {
-      console.log('[BackgroundFetch] Received taskId: ', taskId);
-      await handleNotification(`Task received: ${taskId}`);
+      await handleBackgroundTask(`Task received: ${taskId}`);
       BackgroundFetch.finish(taskId);
     },
     async taskId => {
-      console.log('[BackgroundFetch] TIMEOUT taskId:', taskId);
       BackgroundFetch.finish(taskId);
     },
   );
@@ -38,7 +44,7 @@ export const backgroundTask = async () => {
   });
 };
 
-const createChannels = () => {
+export const createNotificationChannels = () => {
   PushNotification.createChannel(
     {
       channelId: 'channel-1', // ID
@@ -82,12 +88,9 @@ const getCurrentLatLong = () => {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        console.log('Latitude:', latitude);
-        console.log('Longitude:', longitude);
         resolve({latitude, longitude});
       },
       error => {
-        console.error('Location error:', error);
         reject(error);
       },
       {
@@ -124,7 +127,8 @@ const findMatchingLocations = (currentLocation, locationData) => {
   return locationData.filter(loc => {
     const targetLat = loc.LOCATION.latitude;
     const targetLng = loc.LOCATION.longitude;
-    const radiusInMeters = parseFloat(loc.RADIUS); // assumed in meters
+
+    const radiusInMeters = parseFloat(loc.RADIUS) + bufferRadius; // assumed in meters
 
     const distance = getDistanceFromLatLonInMeters(
       latitude,
@@ -132,52 +136,107 @@ const findMatchingLocations = (currentLocation, locationData) => {
       targetLat,
       targetLng,
     );
-
     return distance <= radiusInMeters;
   });
 };
+function formatDateToDDMMYYYY(isoDate) {
+  const date = new Date(isoDate);
 
-const handleBackgroundTask = async message => {
+  // Extract day, month, and year
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const year = date.getFullYear();
+
+  // Format the date as DD/MM/YYYY
+  return `${day}/${month}/${year}`;
+}
+
+const handleBackgroundTask = async location => {
   const state = store.getState();
-  const locationData = state.locationData.locationList;
+  console.log('sadljasdlasdasdas', state);
+
+  let locationData = state.locationData.locationList;
+  let backgroundActivityData =
+    state.backgroundActivityData.backgroundActivityList;
+
+  if (
+    backgroundActivityData.some(
+      val =>
+        val.LAST_DELETED_AT instanceof Date &&
+        val.LAST_DELETED_AT.getDate() < new Date().getDate(),
+    ) ||
+    !backgroundActivityData.some(item => 'LAST_DELETED_AT' in item)
+  ) {
+    store.dispatch(deleteOldBackgroundActivities());
+    backgroundActivityData =
+      state.backgroundActivityData.backgroundActivityList;
+  }
+  const today = new Date();
+  const filteredLocationData = locationData.filter(location => {
+    return !backgroundActivityData.some(
+      activity =>
+        activity.GROUP_ID === location.GROUP_ID &&
+        // activity.LOCATION_ID === location._id &&
+        formatDateToDDMMYYYY(activity.DATE) === formatDateToDDMMYYYY(today),
+    );
+  });
 
   const hasPermission = await requestLocationPermission();
+  console.log('adjnasdnasdsa', hasPermission);
+  
   if (!hasPermission) {
-    console.log('Location permission denied');
     return;
   }
 
-  const data = await getCurrentLatLong();
-
-  const matches = findMatchingLocations(data, locationData);
+  let data;
+  if (location) {
+    data = location;
+  } else {
+    data = await getCurrentLatLong();
+  }
+  const matches = findMatchingLocations(data, filteredLocationData);
+  console.log('dasaskdasdsaasd', matches, data, filteredLocationData);
 
   let payload = [];
+
   if (matches && matches.length > 0) {
     matches.map(val => {
       payload.push({
         GROUP_ID: val.GROUP_ID,
         LOCATION_ID: val._id,
+        DATE: new Date(),
+        DATA_PUSHED_TO_SERVER: false,
       });
     });
 
-    await axios
-      .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
-      .then(response => {
-        console.log('asdasdasdas', response.data);
-        sendNotification(
-          'Background Location Update!',
-          `${message}\nLat: ${data.latitude}\nLng: ${data.longitude}`,
-          'red',
-        );
-      })
-      .catch(err => {
-        console.log('asdasdasdas', err);
-      });
-    console.log('Matching Locations:', matches);
-    console.log('locationData', locationData, data);
-
+    pushDataToServer(payload);
     // Push notification with lat/long
   }
+};
+const pushDataToServer = async payload => {
+  await axios
+    .post(Axios.axiosUrl + Axios.incrementAchievement, payload)
+    .then(response => {
+      store.dispatch(setBackgroundActivity(payload));
+
+      if (response.data.some(val => val.incremented == true)) {
+        const NotificationData = response.data.filter(
+          val => val.incremented == true,
+        );
+        NotificationData.forEach(val => {
+          sendNotification(
+            val.notificationData.NOTIFICATION_TITLE,
+            val.notificationData.NOTIFICATION_DESCRIPTION,
+            'red',
+          );
+        });
+
+        // store.dispatch(setBackgroundActivity(payload));
+      }
+    })
+    .catch(err => {
+      console.log('asdasdasdas1', err);
+    });
 };
 
 const sendNotification = async (title, message, color) => {
@@ -187,19 +246,67 @@ const sendNotification = async (title, message, color) => {
     message: message,
     color: color,
     vibrate: true,
-    vibration: 300,
-    playSound: true,
-    soundName: 'default',
+    vibration: [0, 200, 100, 300], // Standardized pattern
   });
-
-  // Vibration.vibrate([0, 200, 100, 300]);
+  Vibration.vibrate([0, 200, 100, 300]);
 };
 
 export const backgroundHeadlessTask = async event => {
-  console.log('[BackgroundFetch HeadlessTask] start: ', event.taskId);
-
-  createChannels();
-  handleBackgroundTask(`Headless Task received: ${event.taskId}`);
+  createNotificationChannels();
+  handleBackgroundTask(); // Placeholder for actual message
 
   BackgroundFetch.finish(event.taskId);
+};
+const isBetweenMidnightAndOneAM = () => {
+  const now = new Date();
+  const hours = now.getHours();
+  return hours >= 0 && hours < 1;
+};
+
+export const startListeningForLocation = () => {
+  // if (isBetweenMidnightAndOneAM()) {
+  //   store.dispatch(deleteOldBackgroundActivities());
+  // }
+
+  const subscription = locationEventEmitter.addListener(
+    'locationUpdate',
+    location => {
+      console.log('jknkjnnjnjknjk', location);
+
+      handleBackgroundTask(location);
+    },
+  );
+
+  return () => {
+    subscription.remove();
+  };
+};
+
+export const requestNotificationPermissions = async () => {
+  try {
+    const grant = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+
+    if (grant === PermissionsAndroid.RESULTS.GRANTED) {
+    } else {
+      // Ask the user if they'd like to grant it again
+      Alert.alert(
+        'Permission Needed',
+        'This app needs notification permission to keep you updated. Would you like to enable it?',
+        [
+          {
+            text: 'Ask Again',
+            onPress: () => requestNotificationPermissions(),
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+      );
+    }
+  } catch (err) {
+    console.warn(err);
+  }
 };

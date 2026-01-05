@@ -38,6 +38,15 @@ import AnimatedCard from '../../../components/AnimatedCard/AnimatedCard';
 import {getTrackingByUserData} from '../../Redux/Action/getAllGroupData';
 import Axios from '../../utils/Axios';
 import axios from 'axios';
+import {
+  createNotificationChannels,
+  requestNotificationPermissions,
+  startListeningForLocation,
+} from '../../../BackgroundJobs';
+import {
+  requestLocationPermission,
+  startLocationService,
+} from '../../utils/NativeLocationService';
 
 const {width} = Dimensions.get('window');
 const CARD_WIDTH = Math.min(width * 0.9);
@@ -47,6 +56,33 @@ function Dashboard(props) {
   const [newUser, setNewUser] = useState(true);
   const navigation = useNavigation();
   const [milestonesData, setMilestonesData] = useState([]);
+
+  useEffect(() => {
+    const initializeApp = async () => {
+      console.log('App Layout mounted');
+
+      createNotificationChannels();
+
+      // Request location permission first
+      const locationGranted = await requestLocationPermission();
+      console.log('Location Permission:', locationGranted);
+
+      if (locationGranted) {
+        startLocationService();
+        startListeningForLocation(); // Optional: wrap in await if needed
+      }
+
+      // Then request notification permission
+      await requestNotificationPermissions();
+    };
+
+    initializeApp();
+
+    return () => {
+      // cleanup on unmount
+      startListeningForLocation()?.unsubscribe?.(); // optional cleanup if supported
+    };
+  }, []);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -85,11 +121,8 @@ function Dashboard(props) {
       })
       .then(async response => {
         await props.getTrackingByUserData(props.AUTH_DATA?._id);
-
-        console.log('Logout ', response.data);
       })
       .catch(err => {
-        console.log('err', err);
         Toast.show({
           type: 'error',
           text1: `Something went wrong`,

@@ -14,6 +14,8 @@ const getTrackingByUser = 'inOffice/tracking/getTrackingByUser';
 const getTrackingHistory = 'inOffice/tracking/getTrackingHistory';
 const pinTracking = 'inOffice/tracking/pinTracking';
 const userLogout = 'user/userLogout';
+const incrementAchievement = 'inOffice/tracking/incrementAchievement';
+
 export default {
   axiosUrl,
   loginOTPSend,
@@ -31,4 +33,5 @@ export default {
   getTrackingHistory,
   pinTracking,
   deleteGroup,
+  incrementAchievement,
 };

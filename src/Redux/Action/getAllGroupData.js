@@ -18,9 +18,7 @@ export const getGroupByUserData = UserId => async dispatch => {
         payload: data,
       });
     })
-    .catch(err => {
-      console.error('Failed to fetch session data:', err);
-    });
+    .catch(err => {});
 };
 export const getLocationByUserData = UserId => async dispatch => {
   if (!UserId) return 'No User ID provider';
@@ -35,9 +33,7 @@ export const getLocationByUserData = UserId => async dispatch => {
         payload: data,
       });
     })
-    .catch(err => {
-      console.error('Failed to fetch session data:', err);
-    });
+    .catch(err => {});
 };
 export const getTrackingByUserData = UserId => async dispatch => {
   if (!UserId) return 'No User ID provider';
@@ -53,9 +49,7 @@ export const getTrackingByUserData = UserId => async dispatch => {
         payload: data,
       });
     })
-    .catch(err => {
-      console.error('Failed to fetch session data:', err);
-    });
+    .catch(err => {});
 };
 export const getHistoryByTrackingID =
   (TrackingId, UserId) => async dispatch => {
@@ -70,11 +64,16 @@ export const getHistoryByTrackingID =
         },
       );
       const data = response.data;
-      console.log('Tracking History:', data);
 
       return {data};
     } catch (error) {
-      console.error('Failed to fetch tracking history:', error);
       return {error};
     }
   };
+export const setBackgroundActivity = payload => ({
+  type: 'BACKGROUND_ACTIVITY',
+  payload,
+});
+export const deleteOldBackgroundActivities = () => ({
+  type: 'DELETE_OLD_BACKGROUND_ACTIVITIES',
+});

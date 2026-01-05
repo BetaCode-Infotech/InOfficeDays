@@ -3,25 +3,17 @@ import {NativeModules, PermissionsAndroid, Platform} from 'react-native';
 const {LocationServiceModule} = NativeModules;
 
 export const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-        const fineGranted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        );
-        const backgroundGranted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-        );
-        console.log('requestLocationPermission called');
+  if (Platform.OS === 'android') {
+    const fineGranted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    const backgroundGranted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+    );
 
-        const fgsLocationGranted = await PermissionsAndroid.request(
-          'android.permission.FOREGROUND_SERVICE_LOCATION',
-        );
-          
-console.log(
-  '...**...',
-  fineGranted === PermissionsAndroid.RESULTS.GRANTED &&
-    backgroundGranted === PermissionsAndroid.RESULTS.GRANTED &&
-    fgsLocationGranted === PermissionsAndroid.RESULTS.GRANTED,
-);
+    const fgsLocationGranted = await PermissionsAndroid.request(
+      'android.permission.FOREGROUND_SERVICE_LOCATION',
+    );
     return (
       fineGranted === PermissionsAndroid.RESULTS.GRANTED &&
       backgroundGranted === PermissionsAndroid.RESULTS.GRANTED &&
@@ -30,7 +22,6 @@ console.log(
   }
   return true;
 };
-  
 
 export const startLocationService = () => {
   LocationServiceModule.startService();

@@ -76,7 +76,7 @@ export const CategoryList = [
     icon: Icons.workspace,
   },
   {
-    label: 'Meet Girlfriend',
+    label: 'Meet Partner',
     value: 3,
     icon: Icons.hearts,
   },
@@ -94,3 +94,5 @@ export const frequencyOptions = [
   {label: 'Monthly', value: 'monthly', icon: Icons.email},
   {label: 'Quarterly', value: 'quarterly', icon: Icons.email},
 ];
+
+export const bufferRadius = parseFloat(200);

@@ -26,7 +26,6 @@ export const getSessionDataAction = sessionId => async dispatch => {
       })
       .catch(err => {});
   } catch (error) {
-    console.error('Failed to fetch session data:', error);
     // You can also dispatch an error action here if needed
   }
 };

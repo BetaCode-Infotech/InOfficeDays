@@ -2,7 +2,12 @@ import {View, Text, PermissionsAndroid, Alert} from 'react-native';
 import React, {useEffect} from 'react';
 import StackNavigator from './src/navigator/Stack/StackNavigator';
 import {RenderDataOnLoad} from './src/utils/RenderDataOnLoad';
-import {backgroundTask} from './BackgroundJobs';
+import {
+  backgroundTask,
+  createNotificationChannels,
+  requestNotificationPermissions,
+  startListeningForLocation,
+} from './BackgroundJobs';
 // import RenderDataOnLoad from './src/utils/RenderDataOnLoad';
 import {
   startLocationService,
@@ -11,23 +16,34 @@ import {
 } from './src/utils/NativeLocationService';
 const MainLayout = () => {
   useEffect(() => {
-    // requestPermissions();
-    console.log("main layout");
-    requestLocationPermission().then(granted => {
-      console.log("sjcjsdhjhj", granted);
-      if (granted) {
-        console.log('All permissions granted');
+    const initializeApp = async () => {
+      console.log('App Layout mounted');
+
+      createNotificationChannels();
+
+      // Request location permission first
+      const locationGranted = await requestLocationPermission();
+      console.log('Location Permission:', locationGranted);
+
+      if (locationGranted) {
         startLocationService();
-        backgroundTask();
+        startListeningForLocation(); // Optional: wrap in await if needed
       }
-    }).catch(err => {
-      console.error('Error requesting permissions:', err);
-     
-    }
-    );
+
+      // Then request notification permission
+      await requestNotificationPermissions(); // ensure this runs *after* location permission
+
+      // Optional: request background location or other permissions
+      await requestLocationPermissions();
+    };
+
+    initializeApp();
+
+    return () => {
+      // cleanup on unmount
+      startListeningForLocation()?.unsubscribe?.(); // optional cleanup if supported
+    };
   }, []);
-  
-  
 
   const requestLocationPermissions = async () => {
     if (Platform.OS === 'android') {

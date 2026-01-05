@@ -30,6 +30,8 @@ const Profile = props => {
   const dispatch = useDispatch();
 
   const [userDetails, setUserDetails] = useState({});
+  console.log('Adnasdasdas', userDetails);
+
   useEffect(() => {
     setUserDetails({
       ...props.AUTH_DATA,
@@ -66,9 +68,7 @@ const Profile = props => {
       .post(Axios.axiosUrl + Axios.userLogout, {
         SESSION_ID: props.AUTH_DATA?.SESSION_ID,
       })
-      .then(response => {
-        console.log('Logout ', response.data);
-      })
+      .then(response => {})
       .catch(err => {
         console.log('err', err);
       });
@@ -76,6 +76,7 @@ const Profile = props => {
     dispatch({type: 'ALL_TRACKING_LIST', payload: []}); // Use new logout action type
     dispatch({type: 'ALL_LOCATION_LIST', payload: []}); // Use new logout action type
     dispatch({type: 'ALL_GROUP_LIST', payload: []}); // Use new logout action type
+    dispatch({type: 'BACKGROUND_ACTIVITY', payload: []}); // Use new logout action type
     navigation.reset({
       index: 0,
       routes: [{name: ONBOARDING}], // Reset navigation stack to Onboarding
