@@ -164,16 +164,6 @@ const ProfileEdit = props => {
           <Text style={styles.errorText}>{errors.emailId}</Text>
         )}
 
-        {/* <Text style={styles.label}>Mobile Number *</Text>
-        <TextInput
-          style={styles.input}
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-          placeholder="Mobile Number"
-        />
-        {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>} */}
-
         <Text style={styles.label}>Gender *</Text>
         <Dropdown
           style={styles.dropdown}
@@ -264,11 +254,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomButton: {
-    backgroundColor: '#5409DA',
+    backgroundColor: '#000',
     paddingVertical: 16,
     paddingHorizontal: 80,
     borderRadius: 50,
-    shadowColor: '#5409DA',
+    shadowColor: '#000',
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.3,
     shadowRadius: 8,

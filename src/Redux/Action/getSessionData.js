@@ -11,6 +11,7 @@ export const getSessionDataAction = sessionId => async dispatch => {
       })
       .then(response => {
         const data = response.data;
+        console.log('asdjnasjdnsad', data);
 
         if (data.IS_LOGGED_OUT == false) {
           dispatch({
@@ -24,7 +25,9 @@ export const getSessionDataAction = sessionId => async dispatch => {
           });
         }
       })
-      .catch(err => {});
+      .catch(err => {
+        console.log('asdjnaskjdasnkjdsada', err);
+      });
   } catch (error) {
     // You can also dispatch an error action here if needed
   }

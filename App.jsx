@@ -7,20 +7,10 @@ import {persistor, store} from './src/Redux/Store';
 import {PersistGate} from 'redux-persist/es/integration/react';
 // import RenderDataOnLoad from './src/utils/RenderDataOnLoad';
 import {COLORS} from './constants/theme';
-import { startListeningForLocation } from './BackgroundJobs';
+import {startListeningForLocation} from './BackgroundJobs';
 // import RenderDataOnLoad from './src/utils/RenderDataOnLoad';
 
 const App = () => {
- 
-  useEffect(() => {
-    console.log('App mounted');
-    const unsubscribe = startListeningForLocation();
-
-    return () => {
-      unsubscribe(); // clean up
-    };
-  }, []);
-  
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

@@ -41,9 +41,16 @@ const TrackingHistory = props => {
         renderItem={({item}) => (
           <View key={item.KEY} style={styles.card}>
             <View style={styles.cardContent}>
-              <View>
+              <View style={styles.leftContent}>
                 <Text style={styles.title}>{item.LOCATION_NAME}</Text>
-                <Text> On {new Date(item.INCREMENT_DATE).toDateString()}</Text>
+                <Text>
+                  On {new Date(item.INCREMENT_DATE).toDateString()} at{' '}
+                  {new Date(item.INCREMENT_DATE).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}
+                </Text>
               </View>
               <View style={styles.iconContainer}>
                 <>
@@ -79,6 +86,10 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  leftContent: {
+    width: '90%',
+    paddingRight: 8,
   },
   card: {
     backgroundColor: '#FFFFFF',

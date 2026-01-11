@@ -3,278 +3,289 @@ import {
   Text,
   SafeAreaView,
   StyleSheet,
-  Image,
-  StatusBar,
-  Vibration,
-  ScrollView,
   ImageBackground,
   useWindowDimensions,
-  Button,
-  Dimensions,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
   KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   TextInput,
-  Animated,
-  Easing,
+  TouchableOpacity,
+  Vibration,
+  Image,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import LottieView from 'lottie-react-native';
+import React, {useEffect, useState} from 'react';
 import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import {useNavigation} from '@react-navigation/native';
+
 import {COLORS} from '../../../constants/theme';
 import Loader from '../../../components/Loader/Loader';
 import Icons from '../../../constants/Icons';
-
+import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import AnimatedIconButton from '../../../components/IconButton/AnimatedIconButton';
 import Axios from '../../utils/Axios';
-import ImageIcon from '../../../components/ImageIcon/ImageIcon';
-import Images from '../../../constants/Images';
-import {DASHBOARD, OTP_VERIFICATION} from '../../utils/Routes/Routes';
-import {useNavigation} from '@react-navigation/native';
-import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
+import {OTP_VERIFICATION} from '../../utils/Routes/Routes';
 import {toastConfig} from '../../../constants/Fns';
 
-const SingIn = props => {
-  const {height, width} = useWindowDimensions();
+const SingIn = () => {
+  const {height} = useWindowDimensions();
   const navigation = useNavigation();
 
   const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [deviceName, setDeviceName] = useState('');
   const [visible, setVisible] = useState(false);
-  const [IpAddress, setIPAddress] = useState('');
-  const [role, setRole] = useState('AGENT');
-  const DURATION = 100;
-  const PATTERN = [2 * DURATION, 1 * DURATION];
-  useEffect(() => {
-    getDeviceIpAddress();
 
-    let brand = DeviceInfo.getBrand();
-    DeviceInfo.getDevice().then(device => {
-      setDeviceName(brand + ' ' + device);
-    });
+  const DURATION = 100;
+  const PATTERN = [2 * DURATION, DURATION];
+
+  useEffect(() => {
+    DeviceInfo.getIpAddress();
   }, []);
 
-  const getDeviceIpAddress = () => {
-    DeviceInfo.getIpAddress().then(ip => {
-      setIPAddress(ip);
-    });
-  };
-
-  const showToastWarn = label => {
+  const showToastWarn = () => {
     Toast.show({
       type: 'error',
-      text1: `Please fill Email ID`,
+      text1: 'Email required',
+      text2: 'Please enter your email address',
     });
     Vibration.vibrate(PATTERN);
   };
 
   const sendEmailOTP = async () => {
-    if (userName != '') {
-      setVisible(true);
-
-      await axios
-        .post(Axios.axiosUrl + Axios.loginOTPSend, {
-          USER_EMAIL: userName,
-          IS_VERIFIED: false,
-        })
-        .then(response => {
-          setVisible(false);
-          if (response.data.OTP_SEND == true) {
-            navigation.navigate(OTP_VERIFICATION, {
-              EMAIL: userName,
-            });
-          }
-        })
-        .catch(err => {
-          Toast.show({
-            type: 'error',
-            text1: `Something went wrong`,
-            text2: 'Please try again after some time',
-          });
-          Vibration.vibrate(PATTERN);
-          setVisible(false);
-          console.log(err);
-        });
-    } else {
+    if (!userName) {
       showToastWarn();
+      return;
+    }
+
+    setVisible(true);
+    try {
+      const response = await axios.post(Axios.axiosUrl + Axios.loginOTPSend, {
+        USER_EMAIL: userName,
+        IS_VERIFIED: false,
+      });
+
+      setVisible(false);
+      if (response.data.OTP_SEND) {
+        navigation.navigate(OTP_VERIFICATION, {EMAIL: userName});
+      }
+    } catch (error) {
+      setVisible(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Something went wrong',
+        text2: 'Please try again later',
+      });
     }
   };
 
-  const signIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      Alert.alert('Signed In', `Hello ${userInfo.user.name}`);
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        Alert.alert('Cancelled');
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        Alert.alert('Signing in...');
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        Alert.alert('Play Services Not Available');
-      } else {
-        Alert.alert('Some error occurred');
-      }
-    }
-  };
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* <StatusBar
-          animated={true}
-          backgroundColor="#6b2af3"
-          barStyle="dark-content"
-        /> */}
-        <Loader visible={visible} Label="Hold on.." />
-        <ImageBackground
-          source={require('../../../assets/image/login-image-2.jpg')}
-          style={{
-            height: height / 1.7,
-          }}>
-          <View style={[styles.topContainer, {flexDirection: 'row'}]}>
-            <Toast position="top" topOffset={0} config={toastConfig} />
-          </View>
-        </ImageBackground>
-        <KeyboardAvoidingView enabled={true}>
-          <View style={styles.bottomView}>
-            <View
-              style={{
-                // marginTop: 40,
-                marginHorizontal: 50,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <View style={{width: 55}} />
-            </View>
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
+          <Loader visible={visible} Label="Hold on..." />
 
-            <View
-              style={{
-                marginTop: 40,
-                paddingHorizontal: 25,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <View
-                style={[
-                  styles.inputBox,
-                  {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  },
-                ]}>
-                <ImageIcon
-                  icon={Icons.email}
-                  iconStyle={{
-                    width: 25,
-                    height: 25,
-                  }}
-                  containerStyle={{
-                    backgroundColor: COLORS.white,
-                    marginLeft: 10,
-                  }}
-                />
-                <TextInput
-                  placeholder="Enter Email ID"
-                  placeholderTextColor={COLORS.black}
-                  style={{
-                    fontSize: 17,
-                    padding: 10,
-                    color: COLORS.black,
-                  }}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={userName}
-                  onChangeText={email => {
-                    setUserName(email.toLowerCase());
-                  }}
-                />
-              </View>
-              <AnimatedIconButton
-                icon={Icons.next}
-                iconStyle={{
-                  height: 55,
-                  width: 55,
-                  tintColor: '#fff',
-                  backgroundColor: '#6b2af3',
-                  borderRadius: 10,
-                }}
-                onPress={() => {
-                  sendEmailOTP();
-                  // navigation.navigate(DASHBOARD);
-                }}
+          {/* Header */}
+          <ImageBackground
+            source={require('../../../assets/image/login-image-2.jpg')}
+            style={[styles.header, {height: height * 0.45}]}>
+            <Toast position="top" topOffset={0} config={toastConfig} />
+
+            <View style={styles.overlay}></View>
+            <View style={styles.centerBox}>
+              <Text style={styles.appTitle}>In Office</Text>
+              <Text style={styles.tagLine}>
+                Return to office, Gym tracked smartly
+              </Text>
+            </View>
+          </ImageBackground>
+
+          {/* Card */}
+          <View style={styles.card}>
+            <Text style={styles.subtitle}>
+              Sign in to continue tracking your activity
+            </Text>
+            <Text style={styles.label}>Email Address</Text>
+
+            <View style={styles.inputContainer}>
+              <ImageIcon
+                icon={Icons.email}
+                iconStyle={styles.icon}
+                containerStyle={styles.iconContainer}
+              />
+
+              <TextInput
+                placeholder="Enter your email"
+                placeholderTextColor={COLORS.gray50}
+                style={styles.input}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={userName}
+                onChangeText={email => setUserName(email.trim().toLowerCase())}
               />
             </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                marginTop: 50,
-              }}>
-              {/* <Button title="Sign in with Google" onPress={signIn} /> */}
-              {/* <GoogleSigninButton
-                size={GoogleSigninButton.Size.Wide}
-                color={GoogleSigninButton.Color.Light}
-                onPress={() => {
-                  // initiate sign in
-                }}
-                // disabled={isInProgress}
-              /> */}
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={styles.button}
+              onPress={sendEmailOTP}>
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.footerText}>
+              We’ll send you a one-time password to verify
+            </Text>
+            <Image
+              source={require('../../../assets/image/betacode-logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
-        </KeyboardAvoidingView>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
+export default SingIn;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
   },
-  topContainer: {
-    // flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  TopViewText: {
-    color: COLORS.red,
-    fontSize: 35,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-  bottomView: {
-    // flex: 1.5,
-    backgroundColor: COLORS.white,
-    bottom: 100,
-    borderTopStartRadius: 40,
-    borderTopEndRadius: 40,
-  },
-  LoginBtn: {
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignContent: 'center',
-    height: 60,
 
-    backgroundColor: '#4632A1',
-    width: Dimensions.get('window').width / 2,
-    justifyContent: 'center',
-    borderRadius: 40,
+  header: {
+    justifyContent: 'flex-end',
   },
-  inputBox: {
+
+  overlay: {
+    padding: 50,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: COLORS.gray50,
+  },
+
+  subtitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.gray70,
+    marginBottom: 6,
+  },
+
+  card: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: 20,
+    marginTop: -70,
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+
+  label: {
+    fontSize: 14,
+    color: COLORS.gray70,
+    marginBottom: 8,
+  },
+
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    width: Dimensions.get('window').width / 1.5,
-    height: 60,
     borderColor: COLORS.gray20,
-    fontSize: 17,
-    borderRadius: 20,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    height: 56,
+  },
+
+  icon: {
+    width: 22,
+    height: 22,
+    tintColor: COLORS.gray60,
+  },
+
+  iconContainer: {
+    marginRight: 8,
+  },
+
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: COLORS.black,
+  },
+
+  button: {
+    marginTop: 24,
+    height: 54,
+    backgroundColor: COLORS.black,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  footerText: {
+    marginTop: 16,
+    textAlign: 'center',
+    fontSize: 13,
+    color: COLORS.gray60,
+  },
+
+  header: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+
+  centerBox: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    borderRadius: 22,
+    elevation: 10,
+  },
+
+  appTitle: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#2D2D2D',
+    letterSpacing: 1,
+  },
+
+  tagLine: {
+    marginTop: 6,
+    fontSize: 14,
+    color: COLORS.gray50,
+    fontWeight: '500',
+  },
+  logo: {
+    width: "100%",
+    height: 40,
+    marginTop: 12,
+    objectFit: 'contain',
   },
 });
-export default SingIn;

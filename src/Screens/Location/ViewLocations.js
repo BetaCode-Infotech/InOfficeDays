@@ -76,7 +76,8 @@ const ViewLocations = props => {
   useEffect(() => {
     setGroupData(props.GROUP_DATA);
   }, [props.GROUP_DATA]);
-  const optionsIconRef = useRef(null);
+  const [popoverAnchor, setPopoverAnchor] = useState(null);
+
   const openPopover = () => {
     setShowPopover(true);
   };
@@ -170,12 +171,23 @@ const ViewLocations = props => {
       cat => cat.value == item.CATEGORY_ID,
     );
     return (
-      <View key={`location-${item._id}`} style={styles.card}>
+      <TouchableOpacity
+        key={`location-${item._id}`}
+        activeOpacity={0.9}
+        style={styles.card}
+        onPress={() => {
+          handleOptionSelect('Edit');
+          setCurrentPopoverData(item);
+          setUpdatedData(item);
+          setLocationName(item.LOCATION_NAME);
+          setGoogleLocation(item.LOCATION);
+        }}>
         <TouchableOpacity
-          ref={optionsIconRef}
           style={styles.optionsIconContainer}
-          onPress={() => {
+          onPress={event => {
             openPopover();
+            const {pageX, pageY} = event.nativeEvent;
+            setPopoverAnchor({x: pageX, y: pageY});
             setCurrentPopoverData(item);
             setUpdatedData(item);
             setLocationName(item.LOCATION_NAME);
@@ -208,21 +220,7 @@ const ViewLocations = props => {
         </View>
 
         {/* Popover Modal */}
-        <Popover
-          isVisible={showPopover}
-          from={optionsIconRef}
-          onRequestClose={() => setShowPopover(false)}
-          placement="bottom">
-          <View style={{padding: 12}}>
-            <TouchableOpacity onPress={() => handleOptionSelect('Edit')}>
-              <Text style={styles.optionText}>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOptionSelect('Delete')}>
-              <Text style={[styles.optionText, {color: 'red'}]}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </Popover>
-      </View>
+      </TouchableOpacity>
     );
   };
   // --------------------------------------------
@@ -330,6 +328,19 @@ const ViewLocations = props => {
     } catch (err) {}
   };
 
+  const ActionButton = ({title, icon, onPress}) => (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      style={styles.actionButton}>
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.buttonText}>
+        {title}
+      </Text>
+
+      <ImageIcon icon={icon} iconStyle={styles.buttonIcon} />
+    </TouchableOpacity>
+  );
+
   const handleMapPress = event => {
     const {coordinate} = event.nativeEvent;
     getPlaceName(coordinate.latitude, coordinate.longitude);
@@ -369,7 +380,7 @@ const ViewLocations = props => {
         <Toast position="top" topOffset={0} config={toastConfig} />
       </View>
       <Header title="View Locations" showBack />
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-end',
@@ -406,6 +417,13 @@ const ViewLocations = props => {
             }}
           />
         </TouchableOpacity>
+      </View> */}
+      <View style={styles.buttonContainer}>
+        <ActionButton
+          title="Add Location"
+          icon={Icons.locationGroup}
+          onPress={() => navigation.navigate(ADD_LOCATION)}
+        />
       </View>
       <FlatList
         data={groupedLocations}
@@ -416,10 +434,11 @@ const ViewLocations = props => {
               onPress={() => {
                 toggleGroup(item.GROUP_ID);
               }}
+              activeOpacity={0.9}
               style={styles.accordionHeader}>
               <Text style={styles.accordionTitle}>{item.GROUP_NAME}</Text>
               <Text style={{fontSize: 18}}>
-                {expandedGroups[item.GROUP_ID] ? '−' : '+'}
+                {expandedGroups[item.GROUP_ID] ? '▲' : '▼'}
               </Text>
             </TouchableOpacity>
             {expandedGroups[item.GROUP_ID] &&
@@ -428,6 +447,20 @@ const ViewLocations = props => {
         )}
         contentContainerStyle={styles.list}
       />
+      <Popover
+        isVisible={showPopover}
+        from={popoverAnchor}
+        onRequestClose={() => setShowPopover(false)}
+        placement="bottom">
+        <View style={{padding: 12}}>
+          <TouchableOpacity onPress={() => handleOptionSelect('Edit')}>
+            <Text style={styles.optionText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleOptionSelect('Delete')}>
+            <Text style={[styles.optionText, {color: 'red'}]}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      </Popover>
       <Modal
         visible={showDeleteConfirmModal}
         transparent
@@ -606,11 +639,22 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   accordionHeader: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#f2f2f2',
+    // paddingHorizontal: 16,
+    // paddingVertical: 12,
+    // backgroundColor: '#f2f2f2',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 10,
+    // marginVertical: 6,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    // position: 'relative',
   },
   accordionTitle: {
     fontSize: 16,
@@ -781,6 +825,34 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: 10,
     resizeMode: 'contain',
+  },
+  buttonContainer: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', // 🔥 key
+    backgroundColor: '#000',
+    width: 170, // same width always
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    flex: 1, // 🔥 allows text control
+    marginRight: 8,
+  },
+
+  buttonIcon: {
+    width: 28,
+    height: 28,
+    tintColor: '#fff',
   },
 });
 

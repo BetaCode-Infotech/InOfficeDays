@@ -9,9 +9,6 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MapView, {Marker} from 'react-native-maps';
-//   import Geolocation from 'react-native-geolocation-service';
-//   import BackgroundJobs, {backgroundTask} from './BackgroundJobs';
-//   import Notification from './Notification';
 import Notification from '../../../Notification';
 
 const LocationScreen = () => {
@@ -50,43 +47,6 @@ const LocationScreen = () => {
     // Step 1:  Configure BackgroundFetch as usual.
     backgroundTask();
   }, []);
-
-  // const backgroundTask = async () => {
-  //   let status = await BackgroundFetch.configure(
-  //     {
-  //       minimumFetchInterval: 1,
-  //     },
-  //     async taskId => {
-  //       // <-- Event callback
-  //       // This is the fetch-event callback.
-  //       console.log('[BackgroundFetch] taskId: ', taskId);
-
-  //       // Use a switch statement to route task-handling.
-  //       switch (taskId) {
-  //         case 'com.foo.customtask':
-  //           print('Received custom task');
-  //           break;
-  //         default:
-  //           print('Default fetch task');
-  //       }
-  //       // Finish, providing received taskId.
-  //       BackgroundFetch.finish(taskId);
-  //     },
-  //     async taskId => {
-  //       // <-- Task timeout callback
-  //       // This task has exceeded its allowed running-time.
-  //       // You must stop what you're doing and immediately .finish(taskId)
-  //       BackgroundFetch.finish(taskId);
-  //     },
-  //   );
-
-  //   // Step 2:  Schedule a custom "oneshot" task "com.foo.customtask" to execute 5000ms from now.
-  //   BackgroundFetch.scheduleTask({
-  //     taskId: 'com.foo.customtask',
-  //     forceAlarmManager: true,
-  //     delay: 500, // <-- milliseconds
-  //   });
-  // };
 
   return (
     <SafeAreaView style={styles.container}>
