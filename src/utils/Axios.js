@@ -2,18 +2,19 @@ const axiosUrl = 'http://pdhanewala.com:4000/';
 const loginOTPSend = 'inOffice/user/loginOTPSend';
 const loginOTPVerify = 'inOffice/user/loginOTPVerify';
 const userUpdate = 'inOffice/user/userUpdate';
-const getSessionById = 'sessions/getSessionById';
+const getSessionById = 'inOffice/sessions/getSessionById';
 const createGroups = 'inOffice/group/createGroup';
 const updateGroup = 'inOffice/group/updateGroup';
 const deleteGroup = 'inOffice/group/deleteGroup';
 const createLocation = 'inOffice/location/createLocation';
 const updateLocation = 'inOffice/location/updateLocation';
+const monitorLocation = 'inOffice/location/monitorLocation';
 const getGroupByUser = 'inOffice/group/getGroupByUser';
 const getLocationByUser = 'inOffice/location/getLocationByUser';
 const getTrackingByUser = 'inOffice/tracking/getTrackingByUser';
 const getTrackingHistory = 'inOffice/tracking/getTrackingHistory';
 const pinTracking = 'inOffice/tracking/pinTracking';
-const userLogout = 'user/userLogout';
+const logoutBySession = 'inOffice/sessions/logoutBySession';
 const incrementAchievement = 'inOffice/tracking/incrementAchievement';
 
 export default {
@@ -26,7 +27,8 @@ export default {
   getSessionById,
   createLocation,
   updateLocation,
-  userLogout,
+  monitorLocation,
+  logoutBySession,
   getGroupByUser,
   getLocationByUser,
   getTrackingByUser,

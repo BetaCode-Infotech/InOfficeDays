@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,8 @@ import {toastConfig, toBoolean} from '../../../constants/Fns';
 import Loader from '../../../components/Loader/Loader';
 import {useDispatch} from 'react-redux';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
+import {NativeModules} from 'react-native';
+const {UserPrefsModule} = NativeModules;
 
 const {width, height} = Dimensions.get('window');
 const DURATION = 100;
@@ -32,25 +34,14 @@ const OTPVerification = props => {
   const EMAIL = props.route?.params ?? null;
   const [visible, setVisible] = useState(false);
 
-  const [otp, setOtp] = useState(null);
-  const inputs = useRef([]);
-
-  // const handleChange = (text, index) => {
-  //   if (text.length > 1) {
-  //     const newOtp = text.split('').slice(0, 6);
-  //     setOtp(newOtp);
-  //     if (newOtp.length === 6) {
-  //       inputs.current[5]?.blur();
-  //     }
-  //   } else {
-  //     const newOtp = [...otp];
-  //     newOtp[index] = text;
-  //     setOtp(newOtp);
-  //     if (text && index < 5) {
-  //       inputs.current[index + 1]?.focus();
-  //     }
-  //   }
-  // };
+  const [otp, setOtp] = useState(829455);
+  const otpRef = useRef(null);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      otpRef.current.focusField(0);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async () => {
     const isValidOtp = String(otp).length === 6;
@@ -69,7 +60,7 @@ const OTPVerification = props => {
               type: 'AUTH_DATA_GET',
               payload: {...response.data},
             });
-
+            UserPrefsModule.saveUserId(String(response.data._id));
             if (response.data.NEW_USER == true) {
               navigation.navigate(PROFILE_EDIT, {
                 NEW_USER: true,
@@ -102,10 +93,7 @@ const OTPVerification = props => {
   };
 
   return (
-    <ImageBackground
-      // source={require('../../../assets/image/profile-view-bg.jpg')}
-      style={styles.background}
-      resizeMode="cover">
+    <ImageBackground style={styles.background} resizeMode="cover">
       <Loader visible={visible} Label="Hold on.." />
       <View style={styles.container}>
         <View
@@ -121,22 +109,10 @@ const OTPVerification = props => {
         <Text style={styles.title}>Enter OTP</Text>
 
         <View style={styles.otpContainer}>
-          {/* {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={ref => (inputs.current[index] = ref)}
-              style={styles.otpInput}
-              maxLength={1}
-              keyboardType="numeric"
-              value={digit}
-              onChangeText={text => handleChange(text, index)}
-            />
-          ))} */}
           <OTPInputView
+            ref={otpRef}
             style={{width: '90%', height: 150, color: COLORS.black}}
             pinCount={6}
-            // code={this.state.code} //You can supply this prop or not. The component will be used as a controlled / uncontrolled component respectively.
-            // onCodeChanged = {code => { this.setState({code})}}
             autoFocusOnLoad
             codeInputFieldStyle={styles.underlineStyleBase}
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
@@ -148,7 +124,7 @@ const OTPVerification = props => {
 
         <CustomButton
           label="Submit"
-          color={COLORS.secondary}
+          color={COLORS.black}
           containerStyle={{
             width: width - 50,
             padding: 20,

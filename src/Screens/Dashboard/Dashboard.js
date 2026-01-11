@@ -53,7 +53,7 @@ const CARD_WIDTH = Math.min(width * 0.9);
 const DURATION = 100;
 const PATTERN = [2 * DURATION, 1 * DURATION];
 function Dashboard(props) {
-  const [newUser, setNewUser] = useState(true);
+  const [newUser, setNewUser] = useState(null);
   const navigation = useNavigation();
   const [milestonesData, setMilestonesData] = useState([]);
 
@@ -92,13 +92,41 @@ function Dashboard(props) {
     setRefreshing(false);
   };
 
+  // useEffect(() => {
+  //   if (props.GROUP_DATA.length > 0 && props.LOCATION_DATA.length > 0) {
+  //     setNewUser(false);
+  //   } else {
+  //     setNewUser(true);
+  //   }
+  // }, [props.GROUP_DATA, props.LOCATION_DATA]);
+
   useEffect(() => {
-    if (props.GROUP_DATA.length > 0 && props.LOCATION_DATA.length > 0) {
-      setNewUser(false);
-    } else {
-      setNewUser(true);
+    if (props.AUTH_DATA?._id) {
+      getTrackingDataByUser(props.AUTH_DATA?._id);
     }
-  }, [props.GROUP_DATA, props.LOCATION_DATA]);
+  }, [props.AUTH_DATA?._id]);
+  const getTrackingDataByUser = async UserId => {
+    console.log('Asdaskldsalkdasd', props.AUTH_DATA?._id);
+
+    setNewUser(null);
+
+    if (!UserId) return 'No User ID provider';
+    await axios
+      .post(`${Axios.axiosUrl}${Axios.getTrackingByUser}`, {
+        USER_ID: UserId,
+      })
+      .then(response => {
+        const data = response.data;
+        if (data.length > 0) {
+          setNewUser(false);
+        } else {
+          setNewUser(true);
+        }
+      })
+      .catch(err => {
+        setNewUser(true);
+      });
+  };
 
   useEffect(() => {
     let tempTrackingData = [...props.TRACKING_DATA];
@@ -277,7 +305,11 @@ function Dashboard(props) {
         ]}>
         <Toast position="top" topOffset={0} config={toastConfig} />
       </View>
-      <View style={{backgroundColor: '#fff', paddingTop: 10}}>
+      <View
+        style={{
+          backgroundColor: '#fff',
+          paddingTop: 10,
+        }}>
         <IconButton
           icon={profile}
           iconStyle={{
@@ -347,25 +379,25 @@ function Dashboard(props) {
         </View>
       )}
       {newUser == false && (
-        <>
-          {newUser === false && (
-            <FlatList
-              data={milestonesData}
-              keyExtractor={item => item._id}
-              contentContainerStyle={{
-                alignItems: 'center',
-              }}
-              renderItem={renderGroupCard}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-            />
-          )}
-        </>
+        <FlatList
+          data={milestonesData}
+          keyExtractor={item => item._id}
+          contentContainerStyle={{
+            alignItems: 'center',
+          }}
+          renderItem={renderGroupCard}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
       )}
       {newUser == null && (
         <View style={styles.cardWrapper}>
-          <ActivityIndicator size={'large'} color={'#21a3f1'} />
+          <ActivityIndicator
+            size={'large'}
+            color={'#b4b4b4'}
+            style={{transform: [{scale: 1.4}]}}
+          />
         </View>
       )}
     </View>

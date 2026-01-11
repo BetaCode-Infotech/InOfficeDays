@@ -54,7 +54,7 @@ const ViewGroups = props => {
   const [milestoneDays, setMilestoneDays] = useState('');
 
   const scaleValue = useRef(new Animated.Value(1)).current;
-  const optionsIconRef = useRef(null);
+  const [popoverAnchor, setPopoverAnchor] = useState(null);
   const openPopover = () => {
     setShowPopover(true);
   };
@@ -160,6 +160,18 @@ const ViewGroups = props => {
   useEffect(() => {
     setAllGroupsList(props.GROUP_DATA);
   }, [props.GROUP_DATA]);
+  const ActionButton = ({title, icon, onPress}) => (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      style={styles.actionButton}>
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.buttonText}>
+        {title}
+      </Text>
+
+      <ImageIcon icon={icon} iconStyle={styles.buttonIcon} />
+    </TouchableOpacity>
+  );
 
   const renderGroupCard = ({item}) => {
     const categoryData = CategoryList.find(
@@ -167,32 +179,25 @@ const ViewGroups = props => {
     );
 
     return (
-      // <View style={styles.card}>
-      //   <View style={styles.cardContent}>
-      //     <View>
-      //       <Text style={styles.title}>{item.GROUP_NAME}</Text>
-      //       <Text>Target: {item.MILESTONE_FREQUENCY_ID}</Text>
-      //       <Text>Milestone Days: {item.MILESTONE_DAYS}</Text>
-      //     </View>
-      //     <View style={styles.iconContainer}>
-      //       {categoryData?.icon && (
-      //         <>
-      //           <ImageIcon
-      //             icon={categoryData.icon}
-      //             iconStyle={{height: 60, width: 60}}
-      //           />
-      //           <Text>{categoryData?.label}</Text>
-      //         </>
-      //       )}
-      //     </View>
-      //   </View>
-      // </View>
-      <View key={`group-${item._id}`} style={styles.card}>
+      <TouchableOpacity
+        key={`group-${item._id}`}
+        style={styles.card}
+        activeOpacity={0.9}
+        onPress={() => {
+          handleOptionSelect('Edit');
+          setCurrentPopoverData(item);
+          setUpdatedData(item);
+          setGroupName(item.GROUP_NAME);
+          setCategory(item.CATEGORY_ID);
+          setFrequency(item.MILESTONE_FREQUENCY_ID);
+          setMilestoneDays(item.MILESTONE_DAYS);
+        }}>
         <TouchableOpacity
-          ref={optionsIconRef}
           style={styles.optionsIconContainer}
-          onPress={() => {
+          onPress={event => {
             openPopover();
+            const {pageX, pageY} = event.nativeEvent;
+            setPopoverAnchor({x: pageX, y: pageY});
             setCurrentPopoverData(item);
             setUpdatedData(item);
             setGroupName(item.GROUP_NAME);
@@ -229,21 +234,7 @@ const ViewGroups = props => {
         </View>
 
         {/* Popover Modal */}
-        <Popover
-          isVisible={showPopover}
-          from={optionsIconRef}
-          onRequestClose={() => setShowPopover(false)}
-          placement="bottom">
-          <View style={{padding: 12}}>
-            <TouchableOpacity onPress={() => handleOptionSelect('Edit')}>
-              <Text style={styles.optionText}>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOptionSelect('Delete')}>
-              <Text style={[styles.optionText, {color: 'red'}]}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </Popover>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -262,7 +253,7 @@ const ViewGroups = props => {
         ]}>
         <Toast position="top" topOffset={0} config={toastConfig} />
       </View>
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-end',
@@ -301,6 +292,13 @@ const ViewGroups = props => {
             }}
           />
         </TouchableOpacity>
+      </View> */}
+      <View style={styles.buttonContainer}>
+        <ActionButton
+          title="Add Group"
+          icon={Icons.group}
+          onPress={() => navigation.navigate(ADD_GROUP)}
+        />
       </View>
       <FlatList
         data={allGroupsList}
@@ -309,6 +307,20 @@ const ViewGroups = props => {
         style={styles.viewGroups}
         contentContainerStyle={styles.list}
       />
+      <Popover
+        isVisible={showPopover}
+        from={popoverAnchor}
+        onRequestClose={() => setShowPopover(false)}
+        placement="bottom">
+        <View style={{padding: 12}}>
+          <TouchableOpacity onPress={() => handleOptionSelect('Edit')}>
+            <Text style={styles.optionText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleOptionSelect('Delete')}>
+            <Text style={[styles.optionText, {color: 'red'}]}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      </Popover>
       <Modal
         visible={showDeleteConfirmModal}
         transparent
@@ -470,14 +482,6 @@ const ViewGroups = props => {
               </View>
             </View>
           </TouchableWithoutFeedback>
-
-          {/* <View style={styles.bottomButtonContainer}>
-        <TouchableOpacity
-          style={styles.bottomButton}
-          onPress={() => console.log('Submit pressed')}>
-          <Text style={styles.bottomButtonText}>Save</Text>
-        </TouchableOpacity>
-      </View> */}
           <Animated.View
             style={[
               styles.bottomButtonContainer,
@@ -662,5 +666,34 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 13,
     marginTop: 4,
+  },
+  buttonContainer: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', // 🔥 key
+    backgroundColor: '#000',
+    width: 170, // same width always
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    flex: 1, // 🔥 allows text control
+    marginRight: 8,
+  },
+
+  buttonIcon: {
+    width: 28,
+    height: 28,
+    tintColor: '#fff',
   },
 });

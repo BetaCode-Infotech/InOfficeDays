@@ -21,6 +21,8 @@ import Axios from '../../utils/Axios';
 import {COLORS} from '../../../constants/theme';
 import axios from 'axios';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {NativeModules} from 'react-native';
+const {UserPrefsModule} = NativeModules;
 
 const Profile = props => {
   const insets = useSafeAreaInsets();
@@ -30,8 +32,6 @@ const Profile = props => {
   const dispatch = useDispatch();
 
   const [userDetails, setUserDetails] = useState({});
-  console.log('Adnasdasdas', userDetails);
-
   useEffect(() => {
     setUserDetails({
       ...props.AUTH_DATA,
@@ -64,8 +64,9 @@ const Profile = props => {
   };
 
   const logoutCurrentSession = async () => {
+    UserPrefsModule.clearUserId();
     await axios
-      .post(Axios.axiosUrl + Axios.userLogout, {
+      .post(Axios.axiosUrl + Axios.logoutBySession, {
         SESSION_ID: props.AUTH_DATA?.SESSION_ID,
       })
       .then(response => {})
@@ -88,7 +89,7 @@ const Profile = props => {
     <View
       style={{
         flex: 1,
-        paddingTop: insets.top,
+        // paddingTop: insets.top,
         paddingBottom: state.type == 'stack' ? insets.bottom : 0,
         backgroundColor: '#fff',
       }}>
@@ -103,12 +104,13 @@ const Profile = props => {
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 width: 40,
                 height: 40,
-
                 borderRadius: 20,
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
                 margin: 5,
+                borderWidth: 1,
+                borderColor: '#000',
               }}
               iconStyle={{tintColor: '#fff', width: 25, height: 25}}
               onPress={() => navigation.navigate(DASHBOARD)}
@@ -130,50 +132,65 @@ const Profile = props => {
         </ImageBackground>
 
         {/* Profile */}
-        <View style={styles.profile}>
-          <Text style={styles.name}>{userDetails?.NAME} </Text>
-          <Text style={styles.name}>{userDetails?.USER_EMAIL} </Text>
+        <View style={styles.profileCard}>
+          <Text style={styles.profileTitle}>Profile Details</Text>
 
-          {/* Buttons */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate(PROFILE_EDIT)}>
-              <Text style={styles.buttonText}>Edit</Text>
-            </TouchableOpacity>
+          <View style={styles.row}>
+            <Text style={styles.label}>Name</Text>
+            <Text style={styles.value}>{userDetails?.USER_NAME}</Text>
           </View>
 
-          {/* Bio */}
+          <View style={styles.row}>
+            <Text style={styles.label}>Company</Text>
+            <Text style={styles.value}>{userDetails?.COMPANY_NAME}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Gender</Text>
+            <Text style={styles.value}>{userDetails?.GENDER}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.value}>{userDetails?.USER_EMAIL}</Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.editButton}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate(PROFILE_EDIT)}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.buttonLogout,
+              {backgroundColor: '#fdecea', marginVertical: 10},
+            ]}
+            activeOpacity={0.9}
+            onPress={() => {
+              Alert.alert(
+                'Confirm Logout',
+                'Are you sure you want to logout?',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'OK',
+                    onPress: () => logoutCurrentSession(),
+                  },
+                ],
+                {cancelable: true},
+              );
+            }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={[styles.buttonTextLogout, {color: '#d32f2f'}]}>
+                Logout
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={[
-            styles.buttonLogout,
-            {backgroundColor: '#fdecea', marginVertical: 10},
-          ]}
-          onPress={() => {
-            Alert.alert(
-              'Confirm Logout',
-              'Are you sure you want to logout?',
-              [
-                {
-                  text: 'Cancel',
-                  style: 'cancel',
-                },
-                {
-                  text: 'OK',
-                  onPress: () => logoutCurrentSession(),
-                },
-              ],
-              {cancelable: true},
-            );
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={[styles.buttonTextLogout, {color: '#d32f2f'}]}>
-              Logout
-            </Text>
-          </View>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -193,6 +210,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 50,
     padding: 5,
+    elevation: 3, // Android shadow
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   avatar: {
     height: 80,
@@ -204,7 +226,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingHorizontal: 20,
   },
-  username: {color: 'gray', fontSize: 14},
+  username: {color: 'gray', fontSize: 15, fontWeight: 'bold'},
   name: {fontSize: 22, fontWeight: 'bold', marginTop: 5},
   location: {color: '#6e6e6e', marginTop: 2},
   buttonRow: {
@@ -228,7 +250,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: COLORS.black,
     paddingVertical: 14,
-    marginHorizontal: 14,
+    // marginHorizontal: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -278,6 +300,55 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 14,
+  },
+  profileCard: {
+    backgroundColor: '#fff',
+    margin: 16,
+    marginTop: 50,
+    padding: 20,
+    borderRadius: 12,
+    elevation: 3, // Android shadow
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+
+  profileTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+    color: '#222',
+  },
+
+  row: {
+    marginBottom: 12,
+  },
+
+  label: {
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 2,
+  },
+
+  value: {
+    fontSize: 15,
+    color: '#111',
+    fontWeight: '500',
+  },
+
+  editButton: {
+    marginTop: 20,
+    backgroundColor: '#000',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  editButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
 
