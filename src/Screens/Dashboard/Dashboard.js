@@ -281,7 +281,16 @@ function Dashboard(props) {
               </View>
             )}
             <View style={[styles.titleRow, {marginTop: 10}]}>
-              {categoryData?.icon && <ImageIcon icon={categoryData.icon} />}
+              {categoryData?.icon && (
+                <ImageIcon
+                  icon={categoryData.icon}
+                  containerStyle={{
+                    backgroundColor: 'white',
+                    padding: 5,
+                    borderRadius: 10,
+                  }}
+                />
+              )}
               <Text style={styles.badgeText}>
                 {percentage == 100 ? 'Completed' : 'In Progress'}
               </Text>

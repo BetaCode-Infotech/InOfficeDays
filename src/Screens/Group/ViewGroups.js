@@ -225,7 +225,8 @@ const ViewGroups = props => {
               <>
                 <ImageIcon
                   icon={categoryData.icon}
-                  iconStyle={{height: 60, width: 60}}
+                  iconStyle={{height: 40, width: 40}}
+                  resizeMode="contain"
                 />
                 <Text>{categoryData?.label}</Text>
               </>

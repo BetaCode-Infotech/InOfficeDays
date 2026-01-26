@@ -62,23 +62,72 @@ export const toastConfig = {
 export function toBoolean(value) {
   return value === 1 ? true : value === 0 ? false : value;
 }
-import {PermissionsAndroid, Platform, Alert} from 'react-native';
 
 export const CategoryList = [
   {
-    label: 'Fitness',
+    label: 'Office/RTO',
     value: 1,
-    icon: Icons.fitness,
+    icon: Icons.work,
   },
   {
-    label: 'Office',
+    label: 'Gym',
     value: 2,
-    icon: Icons.workspace,
+    icon: Icons.gym,
+  },
+  {
+    label: 'Yoga',
+    value: 3,
+    icon: Icons.meditation,
+  },
+  {
+    label: 'Swimming',
+    value: 4,
+    icon: Icons.swimming_pool,
+  },
+  {
+    label: 'Cricket',
+    value: 5,
+    icon: Icons.cricket,
+  },
+  {
+    label: 'Dance',
+    value: 6,
+    icon: Icons.dance,
+  },
+  {
+    label: 'Boxing',
+    value: 7,
+    icon: Icons.boxing,
+  },
+  {
+    label: 'Badminton',
+    value: 8,
+    icon: Icons.badminton,
+  },
+  {
+    label: 'Tennis',
+    value: 9,
+    icon: Icons.tennis,
+  },
+  {
+    label: 'Football',
+    value: 10,
+    icon: Icons.football,
+  },
+  {
+    label: 'Basketball',
+    value: 11,
+    icon: Icons.basketball,
   },
   {
     label: 'Meet Partner',
-    value: 3,
-    icon: Icons.hearts,
+    value: 12,
+    icon: Icons.lovers,
+  },
+  {
+    label: 'Home Visit',
+    value: 13,
+    icon: Icons.mansion,
   },
 ];
 

@@ -24,6 +24,19 @@ const locationGroup = require('../assets/icons/locations-group.png');
 const updownArrow = require('../assets/icons/up-and-down-arrow.png');
 const optionsDots = require('../assets/icons/options-dots.png');
 const optionsDotsMore = require('../assets/icons/more.png');
+const work = require('../assets/icons/work.png');
+const tennis = require('../assets/icons/tennis.png');
+const swimming_pool = require('../assets/icons/swimming-pool.png');
+const meditation = require('../assets/icons/meditation.png');
+const mansion = require('../assets/icons/mansion.png');
+const lovers = require('../assets/icons/lovers.png');
+const gym = require('../assets/icons/gym.png');
+const football = require('../assets/icons/football.png');
+const dance = require('../assets/icons/dance.png');
+const cricket = require('../assets/icons/cricket.png');
+const boxing = require('../assets/icons/boxing.png');
+const basketball = require('../assets/icons/basketball.png');
+const badminton = require('../assets/icons/badminton.png');
 
 export default {
   account,
@@ -52,4 +65,17 @@ export default {
   optionsDots,
   optionsDotsMore,
   pinFilled,
+  work,
+  tennis,
+  swimming_pool,
+  meditation,
+  mansion,
+  lovers,
+  gym,
+  football,
+  dance,
+  cricket,
+  boxing,
+  basketball,
+  badminton,
 };

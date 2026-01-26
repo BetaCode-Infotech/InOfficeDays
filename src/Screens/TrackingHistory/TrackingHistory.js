@@ -1,4 +1,10 @@
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../../../components/Header/Header';
 import IconButton from '../../../components/IconButton/IconButton';
@@ -8,10 +14,14 @@ import {connect} from 'react-redux';
 import {useRoute} from '@react-navigation/native';
 import Axios from '../../utils/Axios';
 import axios from 'axios';
+import Images from '../../../constants/Images';
+import {Image} from 'react-native-svg';
+import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 
 const TrackingHistory = props => {
   const route = useRoute();
   const [trackingHistory, setTrackingHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
   const passedTrackingID = route.params?.TRACKING_ID || null;
 
   useEffect(() => {
@@ -30,12 +40,34 @@ const TrackingHistory = props => {
       .then(response => {
         setTrackingHistory(response.data);
       })
-      .catch(err => {});
+      .catch(err => {})
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <Header title="Tracking History" showBack showHome />
+      {loading && (
+        <View style={styles.cardWrapper}>
+          <ActivityIndicator
+            size={'large'}
+            color={'#b4b4b4'}
+            style={{transform: [{scale: 1.4}]}}
+          />
+        </View>
+      )}
+      {loading == false && trackingHistory.length === 0 && (
+        <View style={styles.cardWrapper}>
+          <ImageIcon
+            icon={Images.noDataFound} //
+            iconStyle={styles.noDataImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.noDataText}>No Tracking History Available</Text>
+        </View>
+      )}
       <FlatList
         data={trackingHistory}
         renderItem={({item}) => (
@@ -74,6 +106,10 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps)(TrackingHistory);
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -102,5 +138,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 4,
+  },
+  cardWrapper: {
+    flex: 1,
+    justifyContent: 'center', // vertical center
+    alignItems: 'center', // horizontal center
+  },
+  noDataImage: {
+    width: 320,
+    height: 320,
   },
 });

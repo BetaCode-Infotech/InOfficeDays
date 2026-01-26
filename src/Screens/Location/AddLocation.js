@@ -92,6 +92,7 @@ const AddLocation = props => {
   };
   const onSave = () => {
     const newErrors = {};
+    if (group === null) newErrors.group = 'Group is required.';
     if (!locationName.trim())
       newErrors.locationName = 'Location name is required.';
     if (!googleLocation) newErrors.googleLocation = 'Location is required.';
@@ -137,8 +138,7 @@ const AddLocation = props => {
   }, [props.GROUP_DATA]);
   const handleMapPress = event => {
     const {coordinate} = event.nativeEvent;
-    getPlaceName(coordinate.latitude, coordinate.longitude);
-
+    // getPlaceName(coordinate.latitude, coordinate.longitude); // Need this function to get the selected place name automatically
     setGoogleLocation(coordinate); // Update marker position
   };
 
@@ -242,11 +242,11 @@ const AddLocation = props => {
             )}
             <Text style={[styles.label, {marginTop: 20}]}>Location Name *</Text>
             <TextInput
-              style={[styles.cardInput, {backgroundColor: '#eee'}]}
+              style={[styles.cardInput]}
               placeholder="Enter location name"
               placeholderTextColor="#aaa"
               value={locationName}
-              editable={false}
+              // editable={false}
               onChangeText={text => {
                 setLocationName(text);
                 setErrors(prev => ({...prev, locationName: undefined}));
@@ -254,6 +254,42 @@ const AddLocation = props => {
             />
             {errors.locationName && (
               <Text style={styles.errorText}>{errors.locationName}</Text>
+            )}
+            <Text style={[styles.label, {marginTop: 20}]}>
+              Selected latitude & longitude *
+            </Text>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 10,
+              }}>
+              <TextInput
+                style={[styles.cardInput, {flex: 1, backgroundColor: '#eee'}]}
+                placeholder="Enter location name"
+                placeholderTextColor="#aaa"
+                value={googleLocation?.latitude?.toString()}
+                editable={false}
+                onChangeText={text => {
+                  setLocationName(text);
+                  setErrors(prev => ({...prev, locationName: undefined}));
+                }}
+              />
+              <TextInput
+                style={[styles.cardInput, {flex: 1, backgroundColor: '#eee'}]}
+                placeholder="Enter location name"
+                placeholderTextColor="#aaa"
+                value={googleLocation?.longitude?.toString()}
+                editable={false}
+                onChangeText={text => {
+                  setLocationName(text);
+                  setErrors(prev => ({...prev, locationName: undefined}));
+                }}
+              />
+            </View>
+            {errors.googleLocation && (
+              <Text style={styles.errorText}>{errors.googleLocation}</Text>
             )}
 
             {/* <Text style={[styles.label, {marginTop: 20}]}>Location *</Text>
@@ -383,7 +419,7 @@ const AddLocation = props => {
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
                   onPress={onSave}
-                  disabled={loading} // 👈 disables Pressable when loading is true
+                  disabled={loading}
                   style={({pressed}) => [
                     styles.bottomButton,
                     pressed && !loading && {opacity: 0.8},
@@ -510,5 +546,8 @@ const styles = StyleSheet.create({
   },
   locationButtonText: {
     fontSize: 20,
+  },
+  errorText: {
+    color: 'red',
   },
 });

@@ -211,7 +211,8 @@ const ViewLocations = props => {
               <>
                 <ImageIcon
                   icon={categoryData.icon}
-                  iconStyle={{height: 60, width: 60}}
+                  iconStyle={{height: 40, width: 40}}
+                  resizeMode="contain"
                 />
                 <Text>{categoryData?.label}</Text>
               </>
@@ -343,7 +344,7 @@ const ViewLocations = props => {
 
   const handleMapPress = event => {
     const {coordinate} = event.nativeEvent;
-    getPlaceName(coordinate.latitude, coordinate.longitude);
+    // getPlaceName(coordinate.latitude, coordinate.longitude);
 
     setGoogleLocation(coordinate); // Update marker position
   };
@@ -535,9 +536,8 @@ const ViewLocations = props => {
                 Location Name *
               </Text>
               <TextInput
-                style={[styles.cardInput, {backgroundColor: '#eee'}]}
+                style={[styles.cardInput]}
                 value={locationName}
-                editable={false}
                 onChangeText={text => {
                   setLocationName(text);
                   setErrors(prev => ({...prev, locationName: undefined}));
