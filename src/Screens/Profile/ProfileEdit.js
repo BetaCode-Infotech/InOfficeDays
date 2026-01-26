@@ -71,7 +71,6 @@ const ProfileEdit = props => {
       newErrors.emailId = 'Enter a valid Email ID';
     }
     if (!gender.trim()) newErrors.gender = 'Gender is required';
-    if (!company.trim()) newErrors.company = 'Company name is required';
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
@@ -180,7 +179,7 @@ const ProfileEdit = props => {
         />
         {errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
 
-        <Text style={styles.label}>Company Name *</Text>
+        <Text style={styles.label}>Company Name</Text>
         <TextInput
           style={styles.input}
           value={company}
@@ -190,9 +189,6 @@ const ProfileEdit = props => {
             setErrors(prev => ({...prev, company: undefined}));
           }}
         />
-        {errors.company && (
-          <Text style={styles.errorText}>{errors.company}</Text>
-        )}
         <View style={styles.bottomButtonContainer}>
           <Animated.View
             style={[
