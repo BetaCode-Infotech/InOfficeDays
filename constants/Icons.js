@@ -29,13 +29,13 @@ const tennis = require('../assets/icons/tennis.png');
 const swimming_pool = require('../assets/icons/swimming-pool.png');
 const meditation = require('../assets/icons/meditation.png');
 const mansion = require('../assets/icons/mansion.png');
-const lovers = require('../assets/icons/lovers.png');
+const lovers = require('../assets/icons/lovers.jpg');
 const gym = require('../assets/icons/gym.png');
 const football = require('../assets/icons/football.png');
 const dance = require('../assets/icons/dance.png');
 const cricket = require('../assets/icons/cricket.png');
 const boxing = require('../assets/icons/boxing.png');
-const basketball = require('../assets/icons/basketball.png');
+const basketball = require('../assets/icons/basketball.jpg');
 const badminton = require('../assets/icons/badminton.png');
 
 export default {

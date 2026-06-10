@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   Vibration,
   Image,
+  Modal,
+  Pressable,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import DeviceInfo from 'react-native-device-info';
@@ -25,15 +27,20 @@ import Icons from '../../../constants/Icons';
 import ImageIcon from '../../../components/ImageIcon/ImageIcon';
 import AnimatedIconButton from '../../../components/IconButton/AnimatedIconButton';
 import Axios from '../../utils/Axios';
+
 import {OTP_VERIFICATION} from '../../utils/Routes/Routes';
 import {toastConfig} from '../../../constants/Fns';
+import WebView from 'react-native-webview';
 
 const SingIn = () => {
+  const PRIVACY_POLICY_URL = 'https://betacodeinfotech.com/privacy-policy';
   const {height} = useWindowDimensions();
   const navigation = useNavigation();
 
   const [userName, setUserName] = useState('');
   const [visible, setVisible] = useState(false);
+  const [acceptPolicy, setAcceptPolicy] = useState(false);
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
 
   const DURATION = 100;
   const PATTERN = [2 * DURATION, DURATION];
@@ -129,12 +136,79 @@ const SingIn = () => {
               />
             </View>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               activeOpacity={0.9}
               style={styles.button}
               onPress={sendEmailOTP}>
               <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity> */}
+            {/* Privacy Policy Checkbox */}
+            <View style={styles.policyRow}>
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => setAcceptPolicy(!acceptPolicy)}
+                accessibilityRole="checkbox"
+                accessibilityState={{checked: acceptPolicy}}>
+                {acceptPolicy ? <View style={styles.checkboxChecked} /> : null}
+              </TouchableOpacity>
+              <Text style={styles.policyText}>
+                I accept the{' '}
+                <Text
+                  style={styles.policyLink}
+                  onPress={() => setShowPolicyModal(true)}>
+                  Privacy Policy
+                </Text>
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={[styles.button, !acceptPolicy && {opacity: 0.8}]}
+              onPress={sendEmailOTP}
+              disabled={!acceptPolicy}>
+              <Text style={styles.buttonText}>Continue</Text>
             </TouchableOpacity>
+            {/* Privacy Policy Modal */}
+            <Modal
+              visible={showPolicyModal}
+              animationType="slide"
+              transparent={false}
+              onRequestClose={() => setShowPolicyModal(false)}>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    padding: 15,
+                    backgroundColor: '#fff',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#eee',
+                  }}>
+                  <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+                    Privacy Policy
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowPolicyModal(false)}>
+                    <Text style={{fontSize: 20, fontWeight: 'bold'}}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <WebView
+                  source={{uri: PRIVACY_POLICY_URL}}
+                  startInLoadingState={true}
+                />
+
+                <Pressable
+                  style={{
+                    padding: 15,
+                    backgroundColor: '#000',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => setShowPolicyModal(false)}>
+                  <Text style={{color: '#fff', fontWeight: 'bold'}}>Close</Text>
+                </Pressable>
+              </View>
+            </Modal>
 
             <Text style={styles.footerText}>
               We’ll send you a one-time password to verify
@@ -154,6 +228,94 @@ const SingIn = () => {
 export default SingIn;
 
 const styles = StyleSheet.create({
+  policyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 18,
+    marginBottom: 2,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderWidth: 1.5,
+    borderColor: COLORS.gray40,
+    borderRadius: 5,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+  },
+  checkboxChecked: {
+    width: 14,
+    height: 14,
+    backgroundColor: COLORS.black,
+    borderRadius: 3,
+  },
+  policyText: {
+    fontSize: 13,
+    color: COLORS.gray70,
+    flexShrink: 1,
+  },
+  policyLink: {
+    color: COLORS.black,
+    textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    padding: 22,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 10,
+    color: COLORS.black,
+  },
+  modalLink: {
+    color: COLORS.primary || COLORS.black,
+    textDecorationLine: 'underline',
+    marginBottom: 12,
+    fontSize: 14,
+  },
+  modalWebViewBox: {
+    backgroundColor: COLORS.gray10,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 18,
+    width: '100%',
+  },
+  modalWebViewText: {
+    fontSize: 13,
+    color: COLORS.gray70,
+    marginBottom: 4,
+  },
+  modalWebViewUrl: {
+    fontSize: 13,
+    color: COLORS.primary || COLORS.black,
+    textDecorationLine: 'underline',
+  },
+  modalCloseBtn: {
+    marginTop: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    backgroundColor: COLORS.black,
+    borderRadius: 8,
+  },
+  modalCloseText: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: '600',
+  },
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
@@ -283,7 +445,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logo: {
-    width: "100%",
+    width: '100%',
     height: 40,
     marginTop: 12,
     objectFit: 'contain',
